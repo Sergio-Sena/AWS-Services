@@ -35,13 +35,19 @@
                             <i class="fas fa-user text-slate-400"></i>
                         </div>
                         <input
-                            type="text"
+                            type="password"
                             id="username"
                             name="username"
                             required
-                            class="w-full bg-slate-700 border border-slate-600 rounded-lg pl-10 p-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            class="w-full bg-slate-700 border border-slate-600 rounded-lg pl-10 pr-10 p-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                             placeholder="Credenciais não são armazenadas"
                         />
+                        <div
+                            class="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer"
+                            id="toggleUsername"
+                        >
+                            <i class="fas fa-eye text-slate-400 hover:text-slate-300"></i>
+                        </div>
                     </div>
                 </div>
                 <div>
@@ -61,9 +67,15 @@
                             id="password"
                             name="password"
                             required
-                            class="w-full bg-slate-700 border border-slate-600 rounded-lg pl-10 p-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            class="w-full bg-slate-700 border border-slate-600 rounded-lg pl-10 pr-10 p-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                             placeholder="Credenciais não são armazenadas"
                         />
+                        <div
+                            class="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer"
+                            id="togglePassword"
+                        >
+                            <i class="fas fa-eye text-slate-400 hover:text-slate-300"></i>
+                        </div>
                     </div>
                 </div>
                 <div>
@@ -105,6 +117,36 @@
             const form = document.getElementById('loginForm');
             const errorMessage = document.getElementById('errorMessage');
             const loading = document.getElementById('loading');
+            const togglePassword = document.getElementById('togglePassword');
+            const passwordInput = document.getElementById('password');
+            const toggleUsername = document.getElementById('toggleUsername');
+            const usernameInput = document.getElementById('username');
+
+            // Funcionalidade para mostrar/esconder senha
+            if (togglePassword && passwordInput) {
+                togglePassword.addEventListener('click', () => {
+                    const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                    passwordInput.setAttribute('type', type);
+                    
+                    // Alterna o ícone entre olho e olho riscado
+                    const icon = togglePassword.querySelector('i');
+                    icon.classList.toggle('fa-eye');
+                    icon.classList.toggle('fa-eye-slash');
+                });
+            }
+            
+            // Funcionalidade para mostrar/esconder access key
+            if (toggleUsername && usernameInput) {
+                toggleUsername.addEventListener('click', () => {
+                    const type = usernameInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                    usernameInput.setAttribute('type', type);
+                    
+                    // Alterna o ícone entre olho e olho riscado
+                    const icon = toggleUsername.querySelector('i');
+                    icon.classList.toggle('fa-eye');
+                    icon.classList.toggle('fa-eye-slash');
+                });
+            }
 
             form.addEventListener('submit', async (e) => {
                 e.preventDefault();
