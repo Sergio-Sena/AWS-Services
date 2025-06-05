@@ -11,6 +11,7 @@ app.use(cors({
     allowedHeaders: ['Content-Type', 'access_key', 'secret_key']
 }));
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 // Rota de autenticação
 app.post('/auth', async (req, res) => {
@@ -211,6 +212,105 @@ app.get('/download/:bucket/:key(*)', async (req, res) => {
             message: `Erro ao fazer download do objeto`,
             error: error.message
         });
+    }
+});
+
+// Rota para criar bucket
+app.post('/create-bucket', async (req, res) => {
+    const { access_key, secret_key } = req.headers;
+    const { bucket_name, region } = req.body;
+    
+    console.log('Criando bucket:', { bucket_name, region });
+    
+    if (!access_key || !secret_key || !bucket_name) {
+        return res.status(400).json({ 
+            success: false, 
+            message: 'Parâmetros inválidos' 
+        });
+    }
+
+    try {
+        // Configurar o cliente S3 com as credenciais
+        const s3 = new AWS.S3({
+            accessKeyId: access_key,
+            secretAccessKey: secret_key,
+            region: region || 'us-east-1'
+        });
+        
+        // Criar o bucket - tratamento especial para us-east-1
+        if (region === 'us-east-1') {
+            await s3.createBucket({
+                Bucket: bucket_name
+            }).promise();
+        } else {
+            await s3.createBucket({
+                Bucket: bucket_name,
+                CreateBucketConfiguration: {
+                    LocationConstraint: region
+                }
+            }).promise();
+        }
+        
+        res.json({ success: true, message: 'Bucket criado com sucesso' });
+    } catch (error) {
+        console.error('Erro ao criar bucket:', error);
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
+// Configurar multer para upload de arquivos
+const multer = require('multer');
+const upload = multer({ dest: path.join(__dirname, 'uploads/') });
+
+// Rota para upload de arquivos
+app.post('/upload/:bucket', upload.array('files'), async (req, res) => {
+    try {
+        const { access_key, secret_key } = req.headers;
+        const { bucket } = req.params;
+        const { prefix } = req.body;
+        const files = req.files;
+        
+        if (!access_key || !secret_key || !bucket || !files) {
+            return res.status(400).json({ 
+                success: false, 
+                message: 'Parâmetros inválidos' 
+            });
+        }
+        
+        // Configurar o cliente S3 com as credenciais
+        const s3 = new AWS.S3({
+            accessKeyId: access_key,
+            secretAccessKey: secret_key,
+            region: 'us-east-1'
+        });
+        
+        // Upload de cada arquivo
+        const uploadPromises = files.map(file => {
+            const key = prefix ? `${prefix}${file.originalname}` : file.originalname;
+            
+            return s3.upload({
+                Bucket: bucket,
+                Key: key,
+                Body: fs.createReadStream(file.path),
+                ContentType: file.mimetype
+            }).promise();
+        });
+        
+        // Aguardar todos os uploads
+        await Promise.all(uploadPromises);
+        
+        // Limpar arquivos temporários
+        files.forEach(file => {
+            fs.unlinkSync(file.path);
+        });
+        
+        res.json({ 
+            success: true, 
+            message: `${files.length} arquivo(s) enviado(s) com sucesso` 
+        });
+    } catch (error) {
+        console.error('Erro ao fazer upload:', error);
+        res.status(500).json({ success: false, error: error.message });
     }
 });
 

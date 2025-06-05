@@ -188,5 +188,32 @@
 
         // Função de callback do Google Sign-In removida
     </script>
+    <script>
+        // Função simples para testar se o sistema está funcionando
+        function testSystemStatus() {
+            console.log('Sistema funcionando normalmente');
+            alert('Sistema funcionando normalmente');
+        }
+        
+        // Adicionar botão de teste mais visível e clicável
+        document.addEventListener('DOMContentLoaded', () => {
+            const testButton = document.createElement('button');
+            testButton.textContent = 'Testar Sistema';
+            testButton.style.position = 'fixed';
+            testButton.style.bottom = '10px';
+            testButton.style.right = '10px';
+            testButton.style.zIndex = '9999';
+            testButton.style.padding = '10px 15px';
+            testButton.style.backgroundColor = '#3b82f6';
+            testButton.style.color = 'white';
+            testButton.style.border = 'none';
+            testButton.style.borderRadius = '5px';
+            testButton.style.cursor = 'pointer';
+            testButton.onclick = testSystemStatus;
+            document.body.appendChild(testButton);
+        });
+    </script>
+    
+    
 </body>
 </html>

@@ -10,6 +10,93 @@ document.addEventListener('DOMContentLoaded', () => {
     const downloadAll = document.getElementById('downloadAll');
     const logoutBtn = document.getElementById('logoutBtn');
     const loading = document.getElementById('loading');
+    
+    // Elementos para criar bucket
+    const createBucketBtn = document.getElementById('createBucketBtn');
+    const createBucketModal = document.getElementById('createBucketModal');
+    const closeBucketModal = document.getElementById('closeBucketModal');
+    const cancelBucketBtn = document.getElementById('cancelBucketBtn');
+    const createBucketForm = document.getElementById('createBucketForm');
+    
+    // Elementos para upload de arquivos
+    const uploadFilesBtn = document.getElementById('uploadFilesBtn');
+    const uploadModal = document.getElementById('uploadModal');
+    const closeUploadModal = document.getElementById('closeUploadModal');
+    const cancelUploadBtn = document.getElementById('cancelUploadBtn');
+    const uploadForm = document.getElementById('uploadForm');
+    const fileUpload = document.getElementById('fileUpload');
+    const fileList = document.getElementById('fileList');
+    
+    // Função para criar um novo bucket
+    const createBucket = async (bucketName, region) => {
+        try {
+            toggleLoading(true);
+            
+            const response = await fetch('http://localhost:8000/create-bucket', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'access_key': accessKey,
+                    'secret_key': secretKey
+                },
+                body: JSON.stringify({
+                    bucket_name: bucketName,
+                    region: region
+                })
+            });
+            
+            const data = await response.json();
+            
+            if (response.ok && data.success) {
+                return { success: true, message: `Bucket "${bucketName}" criado com sucesso!` };
+            } else {
+                throw new Error(data.error || 'Erro ao criar bucket');
+            }
+        } catch (error) {
+            console.error('Erro ao criar bucket:', error);
+            return { success: false, message: `Erro ao criar bucket: ${error.message}` };
+        } finally {
+            toggleLoading(false);
+        }
+    };
+    
+    // Função para fazer upload de arquivos
+    const uploadFiles = async (files, bucket, prefix = '') => {
+        try {
+            toggleLoading(true);
+            
+            const formData = new FormData();
+            for (let i = 0; i < files.length; i++) {
+                formData.append('files', files[i]);
+            }
+            
+            if (prefix) {
+                formData.append('prefix', prefix);
+            }
+            
+            const response = await fetch(`http://localhost:8000/upload/${bucket}`, {
+                method: 'POST',
+                headers: {
+                    'access_key': accessKey,
+                    'secret_key': secretKey
+                },
+                body: formData
+            });
+            
+            const data = await response.json();
+            
+            if (response.ok && data.success) {
+                return { success: true, message: `${files.length} arquivo(s) enviado(s) com sucesso!` };
+            } else {
+                throw new Error(data.error || 'Erro ao enviar arquivos');
+            }
+        } catch (error) {
+            console.error('Erro ao enviar arquivos:', error);
+            return { success: false, message: `Erro ao enviar arquivos: ${error.message}` };
+        } finally {
+            toggleLoading(false);
+        }
+    };
 
     // Variáveis de estado
     let currentBucket = '';
@@ -495,6 +582,148 @@ document.addEventListener('DOMContentLoaded', () => {
         window.location.replace('index.html');
     });
 
+    // Event listeners para o modal de criar bucket
+    if (createBucketBtn && createBucketModal) {
+        createBucketBtn.addEventListener('click', () => {
+            createBucketModal.classList.remove('hidden');
+        });
+        
+        if (closeBucketModal) {
+            closeBucketModal.addEventListener('click', () => {
+                createBucketModal.classList.add('hidden');
+            });
+        }
+        
+        if (cancelBucketBtn) {
+            cancelBucketBtn.addEventListener('click', () => {
+                createBucketModal.classList.add('hidden');
+            });
+        }
+        
+        if (createBucketForm) {
+            createBucketForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                const bucketName = document.getElementById('bucketName').value.trim();
+                const bucketRegion = document.getElementById('bucketRegion').value;
+                
+                if (!bucketName) {
+                    alert('Por favor, insira um nome para o bucket.');
+                    return;
+                }
+                
+                const result = await createBucket(bucketName, bucketRegion);
+                alert(result.message);
+                
+                if (result.success) {
+                    createBucketModal.classList.add('hidden');
+                    document.getElementById('bucketName').value = '';
+                    // Recarregar a lista de buckets
+                    loadBuckets();
+                }
+            });
+        }
+    }
+    
+    // Event listeners para o modal de upload
+    if (uploadFilesBtn && uploadModal) {
+        uploadFilesBtn.addEventListener('click', () => {
+            // Verificar se um bucket foi selecionado
+            if (!currentBucket) {
+                alert('Por favor, selecione um bucket primeiro.');
+                return;
+            }
+            
+            console.log('Abrindo modal de upload para bucket:', currentBucket);
+            
+            // Preencher o prefixo atual se existir
+            document.getElementById('uploadPrefix').value = currentPrefix || '';
+            
+            // Limpar a lista de arquivos selecionados
+            fileList.innerHTML = '';
+            fileUpload.value = '';
+            
+            uploadModal.classList.remove('hidden');
+        });
+        
+        if (closeUploadModal) {
+            closeUploadModal.addEventListener('click', () => {
+                uploadModal.classList.add('hidden');
+            });
+        }
+        
+        if (cancelUploadBtn) {
+            cancelUploadBtn.addEventListener('click', () => {
+                uploadModal.classList.add('hidden');
+            });
+        }
+        
+        // Event listener para seleção de arquivos
+        if (fileUpload && fileList) {
+            fileUpload.addEventListener('change', () => {
+                const files = fileUpload.files;
+                
+                fileList.innerHTML = '';
+                
+                if (files.length === 0) {
+                    fileList.innerHTML = '<p class="text-slate-400 text-center">Nenhum arquivo selecionado</p>';
+                    return;
+                }
+                
+                for (let i = 0; i < files.length; i++) {
+                    const file = files[i];
+                    const fileSize = formatFileSize(file.size);
+                    
+                    const fileItem = document.createElement('div');
+                    fileItem.className = 'flex items-center justify-between p-2 border-b border-slate-700';
+                    fileItem.innerHTML = `
+                        <div class="flex items-center">
+                            <i class="fas fa-file text-slate-400 mr-2"></i>
+                            <span class="truncate">${file.name}</span>
+                        </div>
+                        <span class="text-xs text-slate-400">${fileSize}</span>
+                    `;
+                    
+                    fileList.appendChild(fileItem);
+                }
+            });
+        }
+        
+        // Event listener para o formulário de upload
+        if (uploadForm) {
+            uploadForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                const files = fileUpload.files;
+                if (files.length === 0) {
+                    alert('Por favor, selecione pelo menos um arquivo.');
+                    return;
+                }
+                
+                const prefix = document.getElementById('uploadPrefix').value.trim();
+                const formattedPrefix = prefix && !prefix.endsWith('/') ? `${prefix}/` : prefix;
+                
+                // Verificar novamente se um bucket está selecionado
+                if (!currentBucket) {
+                    alert('Nenhum bucket selecionado. Por favor, selecione um bucket primeiro.');
+                    return;
+                }
+                
+                console.log('Enviando arquivos para bucket:', currentBucket);
+                const result = await uploadFiles(Array.from(files), currentBucket, formattedPrefix);
+                alert(result.message);
+                
+                if (result.success) {
+                    uploadModal.classList.add('hidden');
+                    // Recarregar a lista de objetos
+                    loadObjects(currentBucket, currentPrefix);
+                }
+            });
+        }
+    }
+    
     // Inicializar a aplicação
     loadBuckets();
 });
+
+

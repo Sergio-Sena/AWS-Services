@@ -43,6 +43,13 @@
                                 <div class="h-10 bg-slate-700 rounded-lg"></div>
                             </div>
                         </div>
+                        <div class="mt-6 pt-6 border-t border-slate-700">
+                            <button id="createBucketBtn" 
+                                class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-lg transition duration-200 flex items-center justify-center">
+                                <i class="fas fa-plus-circle mr-2"></i>
+                                <span>Criar Novo Bucket</span>
+                            </button>
+                        </div>
                     </div>
                 </div>
 
@@ -65,11 +72,11 @@
                             </div>
                         </div>
 
-                        <!-- Download Options -->
+                        <!-- Upload e Download Options -->
                         <div class="border-t border-slate-700 pt-6">
                             <div class="text-center mb-6">
-                                <i class="fas fa-download text-4xl neon-blue mb-3"></i>
-                                <h3 class="text-2xl font-bold neon-blue">Opções de Download</h3>
+                                <i class="fas fa-exchange-alt text-4xl neon-blue mb-3"></i>
+                                <h3 class="text-2xl font-bold neon-blue">Opções de Arquivo</h3>
                             </div>
                             <div class="space-y-6">
                                 <div class="relative">
@@ -81,6 +88,18 @@
                                         placeholder="Filtrar por pasta"
                                         data-tooltip="Digite para filtrar por pasta">
                                 </div>
+                                
+                                <!-- Upload Button -->
+                                <div class="mb-4">
+                                    <button id="uploadFilesBtn" 
+                                        class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-lg transition duration-200 flex items-center justify-center"
+                                        data-tooltip="Enviar arquivos para este bucket">
+                                        <i class="fas fa-cloud-upload-alt mr-2"></i>
+                                        <span>Enviar Arquivos</span>
+                                    </button>
+                                </div>
+                                
+                                <!-- Download Buttons -->
                                 <div class="flex flex-col md:flex-row gap-4">
                                     <button id="downloadSelected" 
                                         class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition duration-200 flex items-center justify-center"
@@ -116,6 +135,95 @@
     <div id="loading" class="loading-overlay">
         <div class="loading-spinner"></div>
         <p class="mt-4 text-lg">Processando...</p>
+    </div>
+
+    <!-- Modal para criar bucket -->
+    <div id="createBucketModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center hidden">
+        <div class="bg-slate-800 rounded-xl p-8 shadow-xl neon-border max-w-md w-full mx-4">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-bold neon-blue">Criar Novo Bucket</h3>
+                <button id="closeBucketModal" class="text-slate-400 hover:text-white">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            <form id="createBucketForm">
+                <div class="mb-6">
+                    <label for="bucketName" class="block text-sm font-medium text-slate-300 mb-1">Nome do Bucket</label>
+                    <input type="text" id="bucketName" 
+                        class="w-full bg-slate-700 border border-slate-600 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        placeholder="meu-bucket-unico" required>
+                    <p class="text-xs text-slate-400 mt-1">O nome deve ser único globalmente e seguir as regras de nomenclatura da AWS.</p>
+                </div>
+                <div class="mb-6">
+                    <label for="bucketRegion" class="block text-sm font-medium text-slate-300 mb-1">Região</label>
+                    <select id="bucketRegion" 
+                        class="w-full bg-slate-700 border border-slate-600 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        <option value="us-east-1">US East (N. Virginia)</option>
+                        <option value="us-east-2">US East (Ohio)</option>
+                        <option value="us-west-1">US West (N. California)</option>
+                        <option value="us-west-2">US West (Oregon)</option>
+                        <option value="sa-east-1">South America (São Paulo)</option>
+                        <option value="eu-west-1">EU (Ireland)</option>
+                        <option value="eu-central-1">EU (Frankfurt)</option>
+                    </select>
+                </div>
+                <div class="flex justify-end">
+                    <button type="button" id="cancelBucketBtn" 
+                        class="bg-slate-600 hover:bg-slate-700 text-white font-bold py-2 px-4 rounded-lg transition duration-200 mr-2">
+                        Cancelar
+                    </button>
+                    <button type="submit" 
+                        class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg transition duration-200">
+                        Criar Bucket
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal para upload de arquivos -->
+    <div id="uploadModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center hidden">
+        <div class="bg-slate-800 rounded-xl p-8 shadow-xl neon-border max-w-md w-full mx-4">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-bold neon-blue">Enviar Arquivos</h3>
+                <button id="closeUploadModal" class="text-slate-400 hover:text-white">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            <form id="uploadForm">
+                <div class="mb-6">
+                    <label for="fileUpload" class="block text-sm font-medium text-slate-300 mb-1">Selecione os arquivos</label>
+                    <div class="border-2 border-dashed border-slate-600 rounded-lg p-6 text-center hover:border-blue-500 transition-colors">
+                        <input type="file" id="fileUpload" multiple class="hidden">
+                        <label for="fileUpload" class="cursor-pointer">
+                            <i class="fas fa-cloud-upload-alt text-4xl text-slate-400 mb-3"></i>
+                            <p class="text-slate-300">Arraste arquivos aqui ou clique para selecionar</p>
+                            <p class="text-xs text-slate-400 mt-2">Tamanho máximo: 100MB por arquivo</p>
+                        </label>
+                    </div>
+                </div>
+                <div id="fileList" class="mb-6 max-h-40 overflow-y-auto custom-scrollbar">
+                    <!-- Lista de arquivos selecionados aparecerá aqui -->
+                </div>
+                <div class="mb-6">
+                    <label for="uploadPrefix" class="block text-sm font-medium text-slate-300 mb-1">Pasta de destino (opcional)</label>
+                    <input type="text" id="uploadPrefix" 
+                        class="w-full bg-slate-700 border border-slate-600 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        placeholder="pasta/subpasta/">
+                    <p class="text-xs text-slate-400 mt-1">Deixe em branco para enviar para a raiz do bucket.</p>
+                </div>
+                <div class="flex justify-end">
+                    <button type="button" id="cancelUploadBtn" 
+                        class="bg-slate-600 hover:bg-slate-700 text-white font-bold py-2 px-4 rounded-lg transition duration-200 mr-2">
+                        Cancelar
+                    </button>
+                    <button type="submit" 
+                        class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg transition duration-200">
+                        Enviar
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
 
     <script src="dashboard.js" defer></script>
