@@ -1,9 +1,10 @@
-# Arquivos de ambiente
+# Arquivos de ambiente e configuração
 .env
 .env.local
 .env.development.local
 .env.test.local
 .env.production.local
+*.config.js
 
 # Dependências
 node_modules/
@@ -27,17 +28,35 @@ logs
 # Arquivos do sistema operacional
 .DS_Store
 Thumbs.db
+desktop.ini
 
 # Arquivos de IDE
 .idea/
 .vscode/
 *.sublime-project
 *.sublime-workspace
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
 
 # Arquivos de teste
 coverage/
 .nyc_output/
+test-*.js
+debug-*.js
+**/test-auth.json
 
 # Arquivos temporários
 *.tmp
 *.temp
+*.bak
+*.cache
+
+# Scripts de manutenção local
+fix-*.bat
+fix-*.sh
+fix-*.md
+commit-*.bat
+commit-*.sh
