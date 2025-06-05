@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>S3 Explorer - Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="gradient-bg min-h-screen text-white p-4">
+    <!-- Header com Navbar -->
+    <div class="mb-8 flex justify-between items-center">
+        <div class="flex items-center">
+            <i class="fas fa-cloud text-5xl neon-blue mr-4"></i>
+            <div>
+                <h1 class="text-3xl font-bold neon-blue">AWS S3 Explorer</h1>
+                <p class="text-slate-300 mt-1">Gerencie seus buckets e objetos</p>
+            </div>
+        </div>
+        <button id="logoutBtn" 
+                class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg transition duration-200 flex items-center"
+                data-tooltip="Sair da conta">
+                <i class="fas fa-sign-out-alt mr-2"></i>
+                <span class="hidden md:inline">Logout</span>
+        </button>
+    </div>
+
+    <!-- Main Content -->
+    <main class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                <!-- Buckets Sidebar -->
+                <div class="md:col-span-1">
+                    <div class="bg-slate-800 bg-opacity-70 backdrop-blur-md rounded-xl p-8 shadow-xl neon-border">
+                        <div class="text-center mb-6">
+                            <i class="fas fa-folder text-4xl neon-blue mb-3"></i>
+                            <h2 class="text-2xl font-bold neon-blue">Seus Buckets S3</h2>
+                        </div>
+                        <div id="bucketsList" class="space-y-3 max-h-[calc(100vh-20rem)] overflow-y-auto custom-scrollbar">
+                            <!-- Loading placeholder para buckets -->
+                            <div class="animate-pulse">
+                                <div class="h-10 bg-slate-700 rounded-lg mb-2"></div>
+                                <div class="h-10 bg-slate-700 rounded-lg mb-2"></div>
+                                <div class="h-10 bg-slate-700 rounded-lg"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Content Area -->
+                <div class="md:col-span-3">
+                    <div class="bg-slate-800 bg-opacity-70 backdrop-blur-md rounded-xl p-8 shadow-xl neon-border">
+                        <!-- Objects List -->
+                        <div id="objectsList" class="mb-8">
+                            <div class="text-center mb-6">
+                                <i class="fas fa-box text-4xl neon-blue mb-3"></i>
+                                <h3 class="text-2xl font-bold neon-blue">Selecione um bucket para ver seu conteúdo</h3>
+                            </div>
+                            <div class="overflow-x-auto">
+                                <!-- Loading placeholder para objetos -->
+                                <div class="animate-pulse">
+                                    <div class="h-8 bg-slate-700 rounded-lg mb-2"></div>
+                                    <div class="h-8 bg-slate-700 rounded-lg mb-2"></div>
+                                    <div class="h-8 bg-slate-700 rounded-lg"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Download Options -->
+                        <div class="border-t border-slate-700 pt-6">
+                            <div class="text-center mb-6">
+                                <i class="fas fa-download text-4xl neon-blue mb-3"></i>
+                                <h3 class="text-2xl font-bold neon-blue">Opções de Download</h3>
+                            </div>
+                            <div class="space-y-6">
+                                <div class="relative">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <i class="fas fa-search text-slate-400"></i>
+                                    </div>
+                                    <input type="text" id="prefixFilter" 
+                                        class="w-full bg-slate-700 border border-slate-600 rounded-lg pl-10 p-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                        placeholder="Filtrar por pasta"
+                                        data-tooltip="Digite para filtrar por pasta">
+                                </div>
+                                <div class="flex flex-col md:flex-row gap-4">
+                                    <button id="downloadSelected" 
+                                        class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition duration-200 flex items-center justify-center"
+                                        disabled 
+                                        data-tooltip="Baixar arquivos selecionados">
+                                        <i class="fas fa-check-square mr-2"></i>
+                                        <span>Download Selecionados</span>
+                                    </button>
+                                    <button id="downloadAll" 
+                                        class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition duration-200 flex items-center justify-center"
+                                        disabled 
+                                        data-tooltip="Baixar todo o bucket">
+                                        <i class="fas fa-cloud-download-alt mr-2"></i>
+                                        <span>Download Todo o Bucket</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+    
+    <!-- Help Text -->
+    <div class="mt-6 text-center text-sm text-slate-400">
+        <p>Precisa de ajuda para gerenciar seus buckets S3?</p>
+        <a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/Welcome.html" 
+           target="_blank"
+           class="text-blue-400 hover:text-blue-300 transition-colors">
+            Consulte a documentação do Amazon S3
+        </a>
+    </div>
+
+    <div id="loading" class="loading-overlay">
+        <div class="loading-spinner"></div>
+        <p class="mt-4 text-lg">Processando...</p>
+    </div>
+
+    <script src="dashboard.js" defer></script>
+</body>
+</html> 
