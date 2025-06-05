@@ -1,50 +1,58 @@
-# AWS S3 Explorer - Frontend
+# S3 Explorer - Frontend
 
-Interface de usuário para explorar e gerenciar buckets e objetos do Amazon S3.
+Interface web para o S3 Explorer.
 
 ## Estrutura de Arquivos
 
-- `index.html`: Página de login com autenticação AWS
-- `dashboard.html`: Dashboard principal para exploração de buckets e objetos
-- `dashboard.js`: Lógica do dashboard e interação com a API
-- `styles.css`: Estilos da aplicação com efeitos visuais modernos
+```
+frontend/
+├── dashboard.html   # Página principal do dashboard
+├── dashboard.js     # Lógica do dashboard
+├── index.html       # Página de login
+├── login.js         # Lógica de login
+└── styles.css       # Estilos CSS
+```
 
-## Como Usar
+## Componentes Principais
 
-1. Certifique-se de que o servidor backend está rodando na porta 8000
-2. Abra o arquivo `index.html` em um navegador web moderno
-3. Faça login com suas credenciais AWS (Access Key ID e Secret Access Key)
-4. No dashboard:
-   - Navegue pelos seus buckets S3 no painel lateral esquerdo
-   - Clique em um bucket para ver seu conteúdo
-   - Navegue pelas pastas clicando nelas
-   - Use a navegação de breadcrumbs para voltar a níveis anteriores
-   - Filtre objetos digitando um prefixo e pressionando Enter
-   - Selecione arquivos para download usando as caixas de seleção
-   - Use os botões de download para baixar arquivos selecionados ou todo o bucket
-   - Clique em "Logout" para sair e limpar suas credenciais
+### Página de Login (index.html, login.js)
 
-## Funcionalidades
+A página de login permite aos usuários autenticar com suas credenciais AWS. As credenciais são validadas pelo backend e armazenadas temporariamente no localStorage para uso nas requisições subsequentes.
 
-- ✅ Login com credenciais AWS
-- ✅ Listagem de buckets S3
-- ✅ Navegação por pastas dentro de buckets
-- ✅ Filtro de objetos por prefixo
-- ✅ Seleção múltipla de arquivos
-- ✅ Download de arquivos individuais
-- ✅ Download de múltiplos arquivos selecionados
-- ✅ Download de todos os arquivos visíveis
-- ✅ Logout seguro
+**Funcionalidades:**
+- Validação de credenciais AWS
+- Armazenamento seguro de credenciais no localStorage
+- Redirecionamento para o dashboard após autenticação bem-sucedida
 
-## Segurança
+### Dashboard (dashboard.html, dashboard.js)
 
-- As credenciais AWS são armazenadas apenas no localStorage do navegador
-- As credenciais são removidas ao fazer logout ou fechar a sessão
-- Nenhuma credencial é persistida no servidor
-- Todas as operações são realizadas através da API backend
+O dashboard é a interface principal para interagir com os buckets e objetos S3.
 
-## Requisitos Técnicos
+**Funcionalidades:**
+- Listagem de buckets
+- Criação de novos buckets
+- Navegação por objetos e "pastas" dentro dos buckets
+- Upload de arquivos para buckets
+- Download de objetos individuais ou em lote
 
-- Navegador web moderno com suporte a JavaScript ES6+
-- Servidor backend rodando na porta 8000
-- Conexão com a internet para acessar os serviços AWS
+## Fluxo de Dados
+
+1. As credenciais são obtidas do localStorage
+2. As requisições para o backend incluem as credenciais nos headers
+3. Os dados recebidos do backend são renderizados na interface
+4. As ações do usuário (criar bucket, upload, download) são enviadas para o backend
+
+## Estilização
+
+A aplicação usa:
+- [Tailwind CSS](https://tailwindcss.com/) para estilização
+- [Font Awesome](https://fontawesome.com/) para ícones
+- Estilos personalizados em `styles.css`
+
+## Desenvolvimento
+
+Para modificar o frontend:
+
+1. Edite os arquivos HTML, CSS ou JavaScript
+2. Teste as alterações abrindo os arquivos no navegador
+3. Não é necessário compilar ou construir o frontend

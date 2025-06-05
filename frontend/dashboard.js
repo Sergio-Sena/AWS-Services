@@ -1,3 +1,12 @@
+/**
+ * Dashboard do S3 Explorer
+ * 
+ * Este script gerencia a interface do dashboard, permitindo aos usuários:
+ * - Visualizar e navegar por buckets S3
+ * - Criar novos buckets
+ * - Fazer upload de arquivos
+ * - Fazer download de objetos
+ */
 document.addEventListener('DOMContentLoaded', () => {
     // Debug
     console.log('Dashboard carregado');

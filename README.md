@@ -1,81 +1,82 @@
-# AWS S3 Explorer
+# S3 Explorer
 
-Aplicação web para explorar e gerenciar buckets e objetos do Amazon S3.
+Uma aplicação web para gerenciar buckets e objetos no Amazon S3.
 
-## Funcionalidades
+## Visão Geral
 
-- ✅ Autenticação com credenciais AWS
-- ✅ Listagem de buckets S3
-- ✅ Navegação por pastas dentro de buckets
-- ✅ Download de arquivos individuais
-- ✅ Download de múltiplos arquivos selecionados
-- ✅ Download de todos os arquivos visíveis em um bucket
+O S3 Explorer permite aos usuários:
+- Autenticar com credenciais AWS
+- Listar e criar buckets S3
+- Navegar por objetos e "pastas" dentro dos buckets
+- Fazer upload de arquivos para buckets
+- Fazer download de objetos individuais ou em lote
 
 ## Estrutura do Projeto
 
-- `frontend/`: Interface de usuário com HTML, CSS e JavaScript
-- `backend/`: API Node.js com Express para interação com AWS S3
+```
+Automação S3/
+├── backend/       # Servidor Node.js/Express
+├── frontend/      # Interface web HTML/CSS/JS
+├── docs/          # Documentação
+├── CHANGELOG.md   # Registro de alterações
+├── LICENSE        # Licença do projeto
+├── README.md      # Este arquivo
+└── SECURITY.md    # Políticas de segurança
+```
 
 ## Requisitos
 
-- Node.js 14+ e npm
-- Conta AWS com credenciais de acesso (Access Key e Secret Key)
+- Node.js 14.x ou superior
 - Navegador web moderno
+- Credenciais AWS com permissões para S3
 
-## Configuração Rápida
+## Instalação
 
-### 1. Configurar o Backend
+### Backend
 
 ```bash
-# Navegar para a pasta do backend
 cd backend
-
-# Instalar dependências
 npm install
-
-# Criar arquivo de configuração
-copy .env.example .env
-
-# Editar o arquivo .env com um editor de texto
-# Não é necessário preencher as credenciais AWS no .env
-```
-
-### 2. Iniciar o Servidor
-
-```bash
-# Na pasta backend
+cp .env.example .env
+# Configure suas variáveis de ambiente no arquivo .env
 npm start
 ```
 
-O servidor será iniciado na porta 8000 por padrão.
+### Frontend
 
-### 3. Acessar o Frontend
+O frontend é estático e não requer instalação. Basta abrir o arquivo `frontend/index.html` em um navegador ou servir os arquivos com um servidor web.
 
-Abra o arquivo `frontend/index.html` em seu navegador.
+## Uso
+
+1. Abra a aplicação no navegador
+2. Faça login com suas credenciais AWS
+3. Navegue pelos buckets e objetos
+4. Use os botões para criar buckets, fazer upload e download de arquivos
+
+## Documentação
+
+- [Manual do Usuário](docs/MANUAL.md)
+- [Documentação da API](docs/API.md)
+- [Guia de Desenvolvimento](docs/DESENVOLVIMENTO.md)
+- [Documentação do Backend](backend/README.md)
+- [Documentação do Frontend](frontend/README.md)
+- [Guia de Contribuição](CONTRIBUTING.md)
+- [Políticas de Segurança](SECURITY.md)
+
+## Funcionalidades
+
+- **Autenticação**: Login seguro com credenciais AWS
+- **Gerenciamento de Buckets**: Listar e criar buckets S3
+- **Navegação de Objetos**: Explorar objetos e "pastas" dentro dos buckets
+- **Upload de Arquivos**: Enviar arquivos para buckets S3
+- **Download de Objetos**: Baixar objetos individuais ou em lote
 
 ## Segurança
 
-- As credenciais AWS são armazenadas apenas temporariamente no localStorage do navegador
-- As credenciais não são persistidas no servidor
-- Todas as operações são realizadas usando as credenciais fornecidas pelo usuário
-- Recomendamos usar credenciais com permissões limitadas (apenas para S3)
+- As credenciais AWS são armazenadas apenas localmente no navegador
+- As credenciais são enviadas apenas para a AWS, nunca para servidores de terceiros
+- Recomendamos usar credenciais com permissões mínimas necessárias
 
-## Guia de Uso
+## Licença
 
-1. Faça login com suas credenciais AWS na página inicial
-2. Navegue pelos seus buckets S3 no painel lateral esquerdo
-3. Clique em um bucket para ver seu conteúdo
-4. Navegue pelas pastas clicando nelas
-5. Use a navegação de breadcrumbs para voltar a níveis anteriores
-6. Selecione arquivos para download usando as caixas de seleção
-7. Use os botões de download para baixar arquivos selecionados ou todo o bucket
-8. Clique em "Logout" para sair e limpar suas credenciais
-
-## Desenvolvimento
-
-Para executar o servidor em modo de desenvolvimento com reinício automático:
-
-```bash
-cd backend
-npm run dev
-```
+Este projeto está licenciado sob a [MIT License](LICENSE).
