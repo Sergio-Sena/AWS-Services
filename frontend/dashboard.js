@@ -280,6 +280,7 @@ document.addEventListener('DOMContentLoaded', () => {
             downloadSelected.disabled = true;
             // Garantir que o botão de deletar bucket esteja habilitado quando o bucket estiver vazio
             deleteBucketBtn.disabled = false;
+            deleteBucketBtn.setAttribute('data-tooltip', 'Deletar bucket vazio');
             return;
         }
 
@@ -588,13 +589,23 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // Habilitar botões de ação
         downloadAll.disabled = false;
-        deleteBucket.disabled = false;
+        // Desabilitar o botão de deletar bucket se o bucket não estiver vazio
+        deleteBucketBtn.disabled = true;
+        deleteBucketBtn.setAttribute('data-tooltip', 'O bucket deve estar vazio para ser deletado');
     };
 
     // Função para atualizar o estado dos botões de ação
     const updateActionButtons = () => {
-        downloadSelected.disabled = selectedObjects.size === 0;
-        deleteSelectedBtn.disabled = selectedObjects.size === 0;
+        const isEmpty = selectedObjects.size === 0;
+        downloadSelected.disabled = isEmpty;
+        deleteSelectedBtn.disabled = isEmpty;
+        
+        // Atualizar o tooltip do botão de deletar selecionados
+        if (isEmpty) {
+            deleteSelectedBtn.setAttribute('data-tooltip', 'Selecione pelo menos um item para deletar');
+        } else {
+            deleteSelectedBtn.setAttribute('data-tooltip', `Deletar ${selectedObjects.size} item(ns) selecionado(s)`);
+        }
     };
 
     // Função para formatar o tamanho do arquivo
@@ -797,7 +808,9 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     
     // Event listener para o botão de deletar objetos selecionados
-    deleteSelectedBtn.addEventListener('click', async () => {
+    if (deleteSelectedBtn) {
+        console.log('Adicionando event listener para o botão deleteSelected');
+        deleteSelectedBtn.addEventListener('click', async () => {
         if (selectedObjects.size === 0) return;
         
         // Confirmar com o usuário
@@ -867,41 +880,48 @@ document.addEventListener('DOMContentLoaded', () => {
             toggleLoading(false);
         }
     });
+    }
     
     // Event listener para o botão de deletar bucket
-    deleteBucketBtn.addEventListener('click', async () => {
-        if (!currentBucket) return;
-        
-        // Confirmar com o usuário
-        if (!confirm(`ATENÇÃO: Você está prestes a deletar o bucket "${currentBucket}". Esta ação não pode ser desfeita. O bucket deve estar vazio. Deseja continuar?`)) {
-            return;
-        }
-        
-        const result = await deleteBucket(currentBucket);
-        alert(result.message);
-        
-        if (result.success) {
-            currentBucket = '';
-            currentPrefix = '';
-            objectsList.querySelector('.overflow-x-auto').innerHTML = `
-                <div class="text-center p-4 text-slate-400">
-                    <i class="fas fa-info-circle mb-2"></i>
-                    <p>Selecione um bucket para ver seu conteúdo</p>
-                </div>
-            `;
-            loadBuckets();
-        }
-    });
+    if (deleteBucketBtn) {
+        console.log('Adicionando event listener para o botão deleteBucket');
+        deleteBucketBtn.addEventListener('click', async () => {
+            if (!currentBucket) return;
+            
+            // Confirmar com o usuário
+            if (!confirm(`ATENÇÃO: Você está prestes a deletar o bucket "${currentBucket}". Esta ação não pode ser desfeita. O bucket deve estar vazio. Deseja continuar?`)) {
+                return;
+            }
+            
+            const result = await deleteBucket(currentBucket);
+            alert(result.message);
+            
+            if (result.success) {
+                currentBucket = '';
+                currentPrefix = '';
+                objectsList.querySelector('.overflow-x-auto').innerHTML = `
+                    <div class="text-center p-4 text-slate-400">
+                        <i class="fas fa-info-circle mb-2"></i>
+                        <p>Selecione um bucket para ver seu conteúdo</p>
+                    </div>
+                `;
+                loadBuckets();
+            }
+        });
+    }
 
     // Event listener para o botão de logout
-    logoutBtn.addEventListener('click', () => {
-        console.log('Logout clicked');
-        // Limpar as credenciais do localStorage
-        localStorage.removeItem('s3_access_key');
-        localStorage.removeItem('s3_secret_key');
-        // Forçar o redirecionamento para a página de login
-        window.location.replace('index.html');
-    });
+    if (logoutBtn) {
+        console.log('Adicionando event listener para o botão logout');
+        logoutBtn.addEventListener('click', () => {
+            console.log('Logout clicked');
+            // Limpar as credenciais do localStorage
+            localStorage.removeItem('s3_access_key');
+            localStorage.removeItem('s3_secret_key');
+            // Forçar o redirecionamento para a página de login
+            window.location.replace('index.html');
+        });
+    }
 
     // Event listeners para o modal de criar bucket
     if (createBucketBtn && createBucketModal) {

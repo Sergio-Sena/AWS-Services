@@ -18,12 +18,20 @@
                 <p class="text-slate-300 mt-1">Gerencie seus buckets e objetos</p>
             </div>
         </div>
-        <button id="logoutBtn" 
-                class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg transition duration-200 flex items-center"
-                data-tooltip="Sair da conta">
-                <i class="fas fa-sign-out-alt mr-2"></i>
-                <span class="hidden md:inline">Logout</span>
-        </button>
+        <div class="flex items-center space-x-3">
+            <a href="aws-services.html" 
+               class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition duration-200 flex items-center"
+               data-tooltip="Voltar para serviços AWS">
+                <i class="fas fa-th-large mr-2"></i>
+                <span class="hidden md:inline">Serviços AWS</span>
+            </a>
+            <button id="logoutBtn" 
+                    class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg transition duration-200 flex items-center"
+                    data-tooltip="Sair da conta">
+                    <i class="fas fa-sign-out-alt mr-2"></i>
+                    <span class="hidden md:inline">Logout</span>
+            </button>
+        </div>
     </div>
 
     <!-- Main Content -->
@@ -120,18 +128,20 @@
                                 <!-- Delete Buttons -->
                                 <div class="flex flex-col md:flex-row gap-4">
                                     <button id="deleteSelected" 
-                                        class="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-4 rounded-lg transition duration-200 flex items-center justify-center"
+                                        class="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-4 rounded-lg transition duration-200 flex items-center justify-center disabled:bg-red-900 disabled:opacity-60 disabled:cursor-not-allowed"
                                         disabled 
                                         data-tooltip="Deletar arquivos selecionados">
                                         <i class="fas fa-trash-alt mr-2"></i>
                                         <span>Deletar Selecionados</span>
+                                        <i class="fas fa-lock ml-2 delete-lock-icon"></i>
                                     </button>
                                     <button id="deleteBucket" 
-                                        class="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-4 rounded-lg transition duration-200 flex items-center justify-center"
+                                        class="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-4 rounded-lg transition duration-200 flex items-center justify-center disabled:bg-red-900 disabled:opacity-60 disabled:cursor-not-allowed"
                                         disabled 
                                         data-tooltip="Deletar bucket atual (deve estar vazio)">
                                         <i class="fas fa-trash mr-2"></i>
                                         <span>Deletar Bucket</span>
+                                        <i class="fas fa-lock ml-2 delete-lock-icon"></i>
                                     </button>
                                 </div>
                             </div>

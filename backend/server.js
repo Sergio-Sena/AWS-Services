@@ -39,7 +39,8 @@ app.post('/auth', async (req, res) => {
         // Se não lançar exceção, as credenciais são válidas
         return res.status(200).json({
             success: true,
-            message: 'Autenticação bem-sucedida'
+            message: 'Autenticação bem-sucedida',
+            redirect: 'aws-services.html'
         });
     } catch (error) {
         console.error('Erro de autenticação:', error);

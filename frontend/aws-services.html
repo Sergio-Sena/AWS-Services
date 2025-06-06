@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AWS Services Explorer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="gradient-bg min-h-screen text-white p-4">
+    <!-- Header com Navbar -->
+    <div class="mb-8 flex justify-between items-center">
+        <div class="flex items-center">
+            <i class="fas fa-cloud text-5xl neon-blue mr-4"></i>
+            <div>
+                <h1 class="text-3xl font-bold neon-blue">AWS Services Explorer</h1>
+                <p class="text-slate-300 mt-1">Gerencie seus serviços AWS</p>
+            </div>
+        </div>
+        <button id="logoutBtn" 
+                class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg transition duration-200 flex items-center"
+                data-tooltip="Sair da conta">
+                <i class="fas fa-sign-out-alt mr-2"></i>
+                <span class="hidden md:inline">Logout</span>
+        </button>
+    </div>
+
+    <!-- Main Content -->
+    <main class="max-w-6xl mx-auto">
+        <div class="text-center mb-10">
+            <h2 class="text-4xl font-bold neon-blue mb-4">Escolha um Serviço AWS</h2>
+            <p class="text-slate-300">Selecione um dos serviços abaixo para começar a gerenciar seus recursos AWS</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- S3 Card -->
+            <div class="bg-slate-800 bg-opacity-70 backdrop-blur-md rounded-xl p-8 shadow-xl neon-border hover:shadow-2xl transition-all transform hover:scale-105">
+                <div class="text-center mb-6">
+                    <i class="fas fa-database text-6xl neon-blue mb-4"></i>
+                    <h3 class="text-2xl font-bold neon-blue">Amazon S3</h3>
+                    <p class="text-slate-300 mt-2">Armazenamento de objetos escalável e durável</p>
+                </div>
+                <ul class="text-slate-300 mb-6 space-y-2">
+                    <li class="flex items-center"><i class="fas fa-check text-green-400 mr-2"></i> Gerenciar buckets</li>
+                    <li class="flex items-center"><i class="fas fa-check text-green-400 mr-2"></i> Upload/download de arquivos</li>
+                    <li class="flex items-center"><i class="fas fa-check text-green-400 mr-2"></i> Organizar em pastas</li>
+                </ul>
+                <div class="text-center">
+                    <a href="dashboard.html" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition duration-200 inline-block w-full">
+                        <i class="fas fa-external-link-alt mr-2"></i> Acessar S3
+                    </a>
+                </div>
+            </div>
+
+            <!-- Lambda Card -->
+            <div class="bg-slate-800 bg-opacity-70 backdrop-blur-md rounded-xl p-8 shadow-xl neon-border hover:shadow-2xl transition-all transform hover:scale-105">
+                <div class="text-center mb-6">
+                    <i class="fas fa-code text-6xl neon-orange mb-4"></i>
+                    <h3 class="text-2xl font-bold neon-orange">AWS Lambda</h3>
+                    <p class="text-slate-300 mt-2">Computação serverless para execução de código</p>
+                </div>
+                <ul class="text-slate-300 mb-6 space-y-2">
+                    <li class="flex items-center"><i class="fas fa-check text-green-400 mr-2"></i> Gerenciar funções</li>
+                    <li class="flex items-center"><i class="fas fa-check text-green-400 mr-2"></i> Configurar gatilhos</li>
+                    <li class="flex items-center"><i class="fas fa-check text-green-400 mr-2"></i> Monitorar execuções</li>
+                </ul>
+                <div class="text-center">
+                    <button class="bg-gray-600 text-white font-bold py-3 px-6 rounded-lg transition duration-200 inline-block w-full cursor-not-allowed opacity-70">
+                        <i class="fas fa-tools mr-2"></i> Em Desenvolvimento
+                    </button>
+                </div>
+            </div>
+
+            <!-- EC2 Card -->
+            <div class="bg-slate-800 bg-opacity-70 backdrop-blur-md rounded-xl p-8 shadow-xl neon-border hover:shadow-2xl transition-all transform hover:scale-105">
+                <div class="text-center mb-6">
+                    <i class="fas fa-server text-6xl neon-green mb-4"></i>
+                    <h3 class="text-2xl font-bold neon-green">Amazon EC2</h3>
+                    <p class="text-slate-300 mt-2">Servidores virtuais na nuvem</p>
+                </div>
+                <ul class="text-slate-300 mb-6 space-y-2">
+                    <li class="flex items-center"><i class="fas fa-check text-green-400 mr-2"></i> Gerenciar instâncias</li>
+                    <li class="flex items-center"><i class="fas fa-check text-green-400 mr-2"></i> Configurar segurança</li>
+                    <li class="flex items-center"><i class="fas fa-check text-green-400 mr-2"></i> Monitorar recursos</li>
+                </ul>
+                <div class="text-center">
+                    <button class="bg-gray-600 text-white font-bold py-3 px-6 rounded-lg transition duration-200 inline-block w-full cursor-not-allowed opacity-70">
+                        <i class="fas fa-tools mr-2"></i> Em Desenvolvimento
+                    </button>
+                </div>
+            </div>
+
+            <!-- CloudFront Card -->
+            <div class="bg-slate-800 bg-opacity-70 backdrop-blur-md rounded-xl p-8 shadow-xl neon-border hover:shadow-2xl transition-all transform hover:scale-105">
+                <div class="text-center mb-6">
+                    <i class="fas fa-globe text-6xl neon-purple mb-4"></i>
+                    <h3 class="text-2xl font-bold neon-purple">CloudFront</h3>
+                    <p class="text-slate-300 mt-2">Rede de entrega de conteúdo global</p>
+                </div>
+                <ul class="text-slate-300 mb-6 space-y-2">
+                    <li class="flex items-center"><i class="fas fa-check text-green-400 mr-2"></i> Gerenciar distribuições</li>
+                    <li class="flex items-center"><i class="fas fa-check text-green-400 mr-2"></i> Configurar origens</li>
+                    <li class="flex items-center"><i class="fas fa-check text-green-400 mr-2"></i> Monitorar métricas</li>
+                </ul>
+                <div class="text-center">
+                    <button class="bg-gray-600 text-white font-bold py-3 px-6 rounded-lg transition duration-200 inline-block w-full cursor-not-allowed opacity-70">
+                        <i class="fas fa-tools mr-2"></i> Em Desenvolvimento
+                    </button>
+                </div>
+            </div>
+
+            <!-- DynamoDB Card -->
+            <div class="bg-slate-800 bg-opacity-70 backdrop-blur-md rounded-xl p-8 shadow-xl neon-border hover:shadow-2xl transition-all transform hover:scale-105">
+                <div class="text-center mb-6">
+                    <i class="fas fa-table text-6xl neon-yellow mb-4"></i>
+                    <h3 class="text-2xl font-bold neon-yellow">DynamoDB</h3>
+                    <p class="text-slate-300 mt-2">Banco de dados NoSQL gerenciado</p>
+                </div>
+                <ul class="text-slate-300 mb-6 space-y-2">
+                    <li class="flex items-center"><i class="fas fa-check text-green-400 mr-2"></i> Gerenciar tabelas</li>
+                    <li class="flex items-center"><i class="fas fa-check text-green-400 mr-2"></i> Consultar dados</li>
+                    <li class="flex items-center"><i class="fas fa-check text-green-400 mr-2"></i> Configurar índices</li>
+                </ul>
+                <div class="text-center">
+                    <button class="bg-gray-600 text-white font-bold py-3 px-6 rounded-lg transition duration-200 inline-block w-full cursor-not-allowed opacity-70">
+                        <i class="fas fa-tools mr-2"></i> Em Desenvolvimento
+                    </button>
+                </div>
+            </div>
+
+            <!-- Placeholder para futuros serviços -->
+            <div class="bg-slate-800 bg-opacity-70 backdrop-blur-md rounded-xl p-8 shadow-xl neon-border hover:shadow-2xl transition-all transform hover:scale-105">
+                <div class="text-center mb-6">
+                    <i class="fas fa-plus-circle text-6xl text-slate-500 mb-4"></i>
+                    <h3 class="text-2xl font-bold text-slate-400">Mais Serviços</h3>
+                    <p class="text-slate-300 mt-2">Novos serviços em breve</p>
+                </div>
+                <ul class="text-slate-300 mb-6 space-y-2">
+                    <li class="flex items-center"><i class="fas fa-clock text-slate-400 mr-2"></i> RDS</li>
+                    <li class="flex items-center"><i class="fas fa-clock text-slate-400 mr-2"></i> SQS</li>
+                    <li class="flex items-center"><i class="fas fa-clock text-slate-400 mr-2"></i> SNS</li>
+                </ul>
+                <div class="text-center">
+                    <button class="bg-gray-600 text-white font-bold py-3 px-6 rounded-lg transition duration-200 inline-block w-full cursor-not-allowed opacity-70">
+                        <i class="fas fa-clock mr-2"></i> Em Breve
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="mt-16 text-center text-sm text-slate-400">
+        <p>AWS Services Explorer &copy; 2024</p>
+        <p class="mt-2">Desenvolvido para gerenciamento simplificado de recursos AWS</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Verificar se as credenciais existem
+            const accessKey = localStorage.getItem('s3_access_key');
+            const secretKey = localStorage.getItem('s3_secret_key');
+
+            if (!accessKey || !secretKey) {
+                console.log('Credenciais não encontradas no localStorage, redirecionando para login');
+                window.location.href = 'index.html';
+                return;
+            }
+
+            // Event listener para o botão de logout
+            const logoutBtn = document.getElementById('logoutBtn');
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', () => {
+                    console.log('Logout clicked');
+                    // Limpar as credenciais do localStorage
+                    localStorage.removeItem('s3_access_key');
+                    localStorage.removeItem('s3_secret_key');
+                    // Forçar o redirecionamento para a página de login
+                    window.location.replace('index.html');
+                });
+            }
+        });
+    </script>
+</body>
+</html>

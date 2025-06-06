@@ -172,10 +172,14 @@
                         throw new Error('Credenciais inválidas');
                     }
 
-                    // Salvar credenciais e redirecionar
+                    const data = await response.json();
+                    
+                    // Salvar credenciais
                     localStorage.setItem('s3_access_key', accessKey);
                     localStorage.setItem('s3_secret_key', secretKey);
-                    window.location.href = 'dashboard.html';
+                    
+                    // Redirecionar para a página especificada na resposta ou para o dashboard por padrão
+                    window.location.href = data.redirect || 'dashboard.html';
 
                 } catch (error) {
                     console.error('Erro:', error);
