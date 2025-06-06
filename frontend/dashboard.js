@@ -17,6 +17,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const prefixFilter = document.getElementById('prefixFilter');
     const downloadSelected = document.getElementById('downloadSelected');
     const downloadAll = document.getElementById('downloadAll');
+    const deleteSelectedBtn = document.getElementById('deleteSelected');
+    const deleteBucketBtn = document.getElementById('deleteBucket');
     const logoutBtn = document.getElementById('logoutBtn');
     const loading = document.getElementById('loading');
     
@@ -110,7 +112,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Variáveis de estado
     let currentBucket = '';
     let currentPrefix = '';
-    let selectedObjects = new Set();
+    let selectedObjects = new Set();  // Armazena tanto objetos quanto prefixos selecionados
     
     // Credenciais da AWS do localStorage
     const accessKey = localStorage.getItem('s3_access_key');
@@ -276,6 +278,8 @@ document.addEventListener('DOMContentLoaded', () => {
             `;
             downloadAll.disabled = true;
             downloadSelected.disabled = true;
+            // Garantir que o botão de deletar bucket esteja habilitado quando o bucket estiver vazio
+            deleteBucketBtn.disabled = false;
             return;
         }
 
@@ -317,6 +321,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <th class="py-2 px-4 text-left">Nome</th>
                         <th class="py-2 px-4 text-left">Tamanho</th>
                         <th class="py-2 px-4 text-left">Última Modificação</th>
+                        <th class="py-2 px-4 text-left">Ações</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -327,15 +332,26 @@ document.addEventListener('DOMContentLoaded', () => {
             const folderName = prefix.Prefix.replace(currentPrefix, '').replace(/\/$/, '');
             tableHtml += `
                 <tr class="border-b border-slate-700 hover:bg-slate-700">
-                    <td class="py-2 px-4"></td>
                     <td class="py-2 px-4">
-                        <button class="folder-item flex items-center text-blue-400 hover:underline" data-prefix="${prefix.Prefix}">
-                            <i class="fas fa-folder mr-2"></i>
-                            <span class="truncate">${folderName}</span>
-                        </button>
+                        <input type="checkbox" class="prefix-checkbox rounded text-blue-500 focus:ring-blue-500" 
+                            data-prefix="${prefix.Prefix}">
+                    </td>
+                    <td class="py-2 px-4">
+                        <div class="flex items-center">
+                            <i class="fas fa-folder mr-2 text-blue-400 folder-navigate" data-prefix="${prefix.Prefix}" style="cursor: pointer;"></i>
+                            <span class="truncate folder-name folder-navigate" data-prefix="${prefix.Prefix}" style="cursor: pointer;">${folderName}</span>
+                            <button class="folder-item ml-2 text-blue-400 hover:text-blue-600" data-prefix="${prefix.Prefix}">
+                                <i class="fas fa-arrow-right"></i>
+                            </button>
+                        </div>
                     </td>
                     <td class="py-2 px-4">-</td>
                     <td class="py-2 px-4">-</td>
+                    <td class="py-2 px-4">
+                        <button class="delete-prefix-btn text-red-400 hover:text-red-600" data-prefix="${prefix.Prefix}" title="Deletar pasta">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </td>
                 </tr>
             `;
         });
@@ -395,6 +411,11 @@ document.addEventListener('DOMContentLoaded', () => {
                         </td>
                         <td class="py-2 px-4">${fileSize}</td>
                         <td class="py-2 px-4">${lastModified}</td>
+                        <td class="py-2 px-4">
+                            <button class="delete-object-btn text-red-400 hover:text-red-600" data-key="${object.Key}" title="Deletar objeto">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </td>
                     </tr>
                 `;
             });
@@ -408,29 +429,33 @@ document.addEventListener('DOMContentLoaded', () => {
         objectsList.querySelector('.overflow-x-auto').innerHTML = tableHtml;
 
         // Adicionar event listeners
-        // Para navegação de pastas
-        document.querySelectorAll('.folder-item').forEach(button => {
-            button.addEventListener('click', () => {
-                const prefix = button.getAttribute('data-prefix');
+        // Para navegação de pastas (botão de seta, ícone de pasta e nome da pasta)
+        document.querySelectorAll('.folder-item, .folder-navigate').forEach(element => {
+            element.addEventListener('click', (e) => {
+                e.stopPropagation(); // Impedir propagação do evento
+                const prefix = element.getAttribute('data-prefix');
                 currentPrefix = prefix;
                 loadObjects(currentBucket, prefix);
             });
         });
 
         // Para breadcrumbs
-        document.querySelectorAll('[data-prefix]').forEach(button => {
-            button.addEventListener('click', () => {
-                const prefix = button.getAttribute('data-prefix');
-                currentPrefix = prefix;
-                loadObjects(currentBucket, prefix);
-            });
+        document.querySelectorAll('[data-prefix]:not(.prefix-checkbox):not(.folder-name)').forEach(button => {
+            if (!button.classList.contains('delete-prefix-btn')) {
+                button.addEventListener('click', () => {
+                    const prefix = button.getAttribute('data-prefix');
+                    currentPrefix = prefix;
+                    loadObjects(currentBucket, prefix);
+                });
+            }
         });
 
         // Para seleção de objetos
-        const checkboxes = document.querySelectorAll('.object-checkbox');
+        const objectCheckboxes = document.querySelectorAll('.object-checkbox');
+        const prefixCheckboxes = document.querySelectorAll('.prefix-checkbox');
         const selectAllCheckbox = document.getElementById('selectAll');
         
-        checkboxes.forEach(checkbox => {
+        objectCheckboxes.forEach(checkbox => {
             checkbox.addEventListener('change', () => {
                 const key = checkbox.getAttribute('data-key');
                 
@@ -440,13 +465,101 @@ document.addEventListener('DOMContentLoaded', () => {
                     selectedObjects.delete(key);
                 }
                 
-                updateDownloadButtons();
+                updateActionButtons();
+            });
+        });
+        
+        // Para seleção de pastas (prefixos)
+        prefixCheckboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', (e) => {
+                e.stopPropagation(); // Impedir propagação do evento
+                const prefix = checkbox.getAttribute('data-prefix');
+                
+                if (checkbox.checked) {
+                    selectedObjects.add(prefix);
+                } else {
+                    selectedObjects.delete(prefix);
+                }
+                
+                updateActionButtons();
+            });
+            
+            // Impedir que o clique no checkbox navegue para a pasta
+            checkbox.addEventListener('click', (e) => {
+                e.stopPropagation();
+            });
+        });
+        
+        // Para botões de deletar objeto
+        document.querySelectorAll('.delete-object-btn').forEach(button => {
+            button.addEventListener('click', async () => {
+                const key = button.getAttribute('data-key');
+                
+                if (confirm(`Tem certeza que deseja deletar o objeto "${key}"?`)) {
+                    const result = await deleteObject(currentBucket, key);
+                    alert(result.message);
+                    
+                    if (result.success) {
+                        loadObjects(currentBucket, currentPrefix);
+                    }
+                }
+            });
+        });
+        
+        // Para botões de deletar pasta (prefixo)
+        document.querySelectorAll('.delete-prefix-btn').forEach(button => {
+            button.addEventListener('click', async () => {
+                const prefix = button.getAttribute('data-prefix');
+                
+                if (confirm(`Tem certeza que deseja deletar a pasta "${prefix}" e todo o seu conteúdo?`)) {
+                    // Primeiro, precisamos listar todos os objetos neste prefixo
+                    try {
+                        toggleLoading(true);
+                        
+                        const response = await fetch(`http://localhost:8000/objects/${currentBucket}?prefix=${encodeURIComponent(prefix)}`, {
+                            method: 'GET',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'access_key': accessKey,
+                                'secret_key': secretKey
+                            }
+                        });
+                        
+                        if (!response.ok) {
+                            throw new Error('Falha ao listar objetos da pasta');
+                        }
+                        
+                        const data = await response.json();
+                        
+                        if (data.success && data.objects && data.objects.length > 0) {
+                            // Extrair as chaves dos objetos
+                            const keys = data.objects.map(obj => obj.Key);
+                            
+                            // Deletar todos os objetos
+                            const result = await deleteObjects(currentBucket, keys);
+                            alert(result.message);
+                            
+                            if (result.success) {
+                                loadObjects(currentBucket, currentPrefix);
+                            }
+                        } else {
+                            alert('A pasta está vazia ou não foi possível listar seu conteúdo.');
+                            loadObjects(currentBucket, currentPrefix);
+                        }
+                    } catch (error) {
+                        console.error('Erro ao deletar pasta:', error);
+                        alert(`Erro ao deletar pasta: ${error.message}`);
+                    } finally {
+                        toggleLoading(false);
+                    }
+                }
             });
         });
         
         if (selectAllCheckbox) {
             selectAllCheckbox.addEventListener('change', () => {
-                checkboxes.forEach(checkbox => {
+                // Selecionar todos os objetos
+                objectCheckboxes.forEach(checkbox => {
                     checkbox.checked = selectAllCheckbox.checked;
                     
                     const key = checkbox.getAttribute('data-key');
@@ -457,17 +570,31 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 });
                 
-                updateDownloadButtons();
+                // Selecionar todos os prefixos
+                prefixCheckboxes.forEach(checkbox => {
+                    checkbox.checked = selectAllCheckbox.checked;
+                    
+                    const prefix = checkbox.getAttribute('data-prefix');
+                    if (selectAllCheckbox.checked) {
+                        selectedObjects.add(prefix);
+                    } else {
+                        selectedObjects.delete(prefix);
+                    }
+                });
+                
+                updateActionButtons();
             });
         }
         
-        // Habilitar botão de download de todo o bucket
+        // Habilitar botões de ação
         downloadAll.disabled = false;
+        deleteBucket.disabled = false;
     };
 
-    // Função para atualizar o estado dos botões de download
-    const updateDownloadButtons = () => {
+    // Função para atualizar o estado dos botões de ação
+    const updateActionButtons = () => {
         downloadSelected.disabled = selectedObjects.size === 0;
+        deleteSelectedBtn.disabled = selectedObjects.size === 0;
     };
 
     // Função para formatar o tamanho do arquivo
@@ -514,6 +641,94 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
+    };
+    
+    // Função para deletar um único objeto
+    const deleteObject = async (bucket, key) => {
+        try {
+            toggleLoading(true);
+            
+            const response = await fetch(`http://localhost:8000/object/${bucket}/${encodeURIComponent(key)}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'access_key': accessKey,
+                    'secret_key': secretKey
+                }
+            });
+            
+            const data = await response.json();
+            
+            if (response.ok && data.success) {
+                return { success: true, message: `Objeto "${key}" deletado com sucesso!` };
+            } else {
+                throw new Error(data.error || 'Erro ao deletar objeto');
+            }
+        } catch (error) {
+            console.error('Erro ao deletar objeto:', error);
+            return { success: false, message: `Erro ao deletar objeto: ${error.message}` };
+        } finally {
+            toggleLoading(false);
+        }
+    };
+    
+    // Função para deletar múltiplos objetos
+    const deleteObjects = async (bucket, keys) => {
+        try {
+            toggleLoading(true);
+            
+            const response = await fetch(`http://localhost:8000/objects/${bucket}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'access_key': accessKey,
+                    'secret_key': secretKey
+                },
+                body: JSON.stringify({ keys })
+            });
+            
+            const data = await response.json();
+            
+            if (response.ok && data.success) {
+                return { success: true, message: `${keys.length} objeto(s) deletado(s) com sucesso!` };
+            } else {
+                throw new Error(data.error || 'Erro ao deletar objetos');
+            }
+        } catch (error) {
+            console.error('Erro ao deletar objetos:', error);
+            return { success: false, message: `Erro ao deletar objetos: ${error.message}` };
+        } finally {
+            toggleLoading(false);
+        }
+    };
+    
+    // Função para deletar um bucket
+    const deleteBucket = async (bucket) => {
+        try {
+            toggleLoading(true);
+            
+            const response = await fetch(`http://localhost:8000/bucket/${bucket}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'access_key': accessKey,
+                    'secret_key': secretKey
+                }
+            });
+            
+            const data = await response.json();
+            
+            if (response.ok && data.success) {
+                return { success: true, message: `Bucket "${bucket}" deletado com sucesso!` };
+            } else {
+                throw new Error(data.error || 'Erro ao deletar bucket');
+            }
+        } catch (error) {
+            console.error('Erro ao deletar bucket:', error);
+            return { success: false, message: `Erro ao deletar bucket: ${error.message}` };
+        } finally {
+            toggleLoading(false);
+        }
     };
 
     // Event listener para o botão de download de objetos selecionados
@@ -579,6 +794,103 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }, 500 * index); // 500ms de intervalo entre cada download
         });
+    });
+    
+    // Event listener para o botão de deletar objetos selecionados
+    deleteSelectedBtn.addEventListener('click', async () => {
+        if (selectedObjects.size === 0) return;
+        
+        // Confirmar com o usuário
+        if (!confirm(`Tem certeza que deseja deletar ${selectedObjects.size} item(ns) selecionado(s)?`)) {
+            return;
+        }
+        
+        try {
+            toggleLoading(true);
+            
+            const selectedItems = Array.from(selectedObjects);
+            const objectKeys = [];
+            const prefixesToProcess = [];
+            
+            // Separar objetos e prefixos
+            selectedItems.forEach(item => {
+                if (item.endsWith('/')) {
+                    prefixesToProcess.push(item);
+                } else {
+                    objectKeys.push(item);
+                }
+            });
+            
+            // Processar prefixos (pastas)
+            for (const prefix of prefixesToProcess) {
+                // Listar todos os objetos no prefixo
+                const response = await fetch(`http://localhost:8000/objects/${currentBucket}?prefix=${encodeURIComponent(prefix)}`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'access_key': accessKey,
+                        'secret_key': secretKey
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`Falha ao listar objetos da pasta ${prefix}`);
+                }
+                
+                const data = await response.json();
+                
+                if (data.success && data.objects && data.objects.length > 0) {
+                    // Adicionar todas as chaves dos objetos à lista de objetos para deletar
+                    data.objects.forEach(obj => {
+                        objectKeys.push(obj.Key);
+                    });
+                }
+            }
+            
+            // Se temos objetos para deletar
+            if (objectKeys.length > 0) {
+                const result = await deleteObjects(currentBucket, objectKeys);
+                alert(result.message);
+                
+                if (result.success) {
+                    selectedObjects.clear();
+                    loadObjects(currentBucket, currentPrefix);
+                }
+            } else {
+                alert('Nenhum objeto encontrado para deletar.');
+                loadObjects(currentBucket, currentPrefix);
+            }
+        } catch (error) {
+            console.error('Erro ao deletar itens selecionados:', error);
+            alert(`Erro ao deletar itens selecionados: ${error.message}`);
+        } finally {
+            toggleLoading(false);
+        }
+    });
+    
+    // Event listener para o botão de deletar bucket
+    deleteBucketBtn.addEventListener('click', async () => {
+        if (!currentBucket) return;
+        
+        // Confirmar com o usuário
+        if (!confirm(`ATENÇÃO: Você está prestes a deletar o bucket "${currentBucket}". Esta ação não pode ser desfeita. O bucket deve estar vazio. Deseja continuar?`)) {
+            return;
+        }
+        
+        const result = await deleteBucket(currentBucket);
+        alert(result.message);
+        
+        if (result.success) {
+            currentBucket = '';
+            currentPrefix = '';
+            objectsList.querySelector('.overflow-x-auto').innerHTML = `
+                <div class="text-center p-4 text-slate-400">
+                    <i class="fas fa-info-circle mb-2"></i>
+                    <p>Selecione um bucket para ver seu conteúdo</p>
+                </div>
+            `;
+            loadBuckets();
+        }
     });
 
     // Event listener para o botão de logout

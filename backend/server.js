@@ -7,9 +7,10 @@ const app = express();
 // Middleware
 app.use(cors({
     origin: '*',
-    methods: ['GET', 'POST'],
+    methods: ['GET', 'POST', 'DELETE'],  // Adicione DELETE aqui
     allowedHeaders: ['Content-Type', 'access_key', 'secret_key']
 }));
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -311,6 +312,133 @@ app.post('/upload/:bucket', upload.array('files'), async (req, res) => {
     } catch (error) {
         console.error('Erro ao fazer upload:', error);
         res.status(500).json({ success: false, error: error.message });
+    }
+});
+
+// Rota para deletar um único objeto
+app.delete('/object/:bucket/:key(*)', async (req, res) => {
+    const { access_key, secret_key } = req.headers;
+    const { bucket } = req.params;
+    let { key } = req.params;
+    
+    if (!access_key || !secret_key || !bucket || !key) {
+        return res.status(400).json({ 
+            success: false, 
+            message: 'Parâmetros inválidos' 
+        });
+    }
+
+    try {
+        // Decodificar a chave do objeto
+        key = decodeURIComponent(key);
+        
+        // Configurar o cliente S3 com as credenciais
+        const s3 = new AWS.S3({
+            accessKeyId: access_key,
+            secretAccessKey: secret_key,
+            region: 'us-east-1'
+        });
+        
+        // Deletar o objeto
+        await s3.deleteObject({
+            Bucket: bucket,
+            Key: key
+        }).promise();
+        
+        res.json({ 
+            success: true, 
+            message: `Objeto ${key} deletado com sucesso` 
+        });
+    } catch (error) {
+        console.error(`Erro ao deletar objeto ${key}:`, error);
+        res.status(500).json({ 
+            success: false, 
+            error: error.message 
+        });
+    }
+});
+
+// Rota para deletar múltiplos objetos
+app.delete('/objects/:bucket', async (req, res) => {
+    const { access_key, secret_key } = req.headers;
+    const { bucket } = req.params;
+    const { keys } = req.body;
+    
+    if (!access_key || !secret_key || !bucket || !keys || !Array.isArray(keys) || keys.length === 0) {
+        return res.status(400).json({ 
+            success: false, 
+            message: 'Parâmetros inválidos' 
+        });
+    }
+
+    try {
+        // Configurar o cliente S3 com as credenciais
+        const s3 = new AWS.S3({
+            accessKeyId: access_key,
+            secretAccessKey: secret_key,
+            region: 'us-east-1'
+        });
+        
+        // Preparar objetos para deleção
+        const objects = keys.map(key => ({ Key: key }));
+        
+        // Deletar os objetos
+        await s3.deleteObjects({
+            Bucket: bucket,
+            Delete: {
+                Objects: objects,
+                Quiet: false
+            }
+        }).promise();
+        
+        res.json({ 
+            success: true, 
+            message: `${keys.length} objeto(s) deletado(s) com sucesso` 
+        });
+    } catch (error) {
+        console.error('Erro ao deletar objetos:', error);
+        res.status(500).json({ 
+            success: false, 
+            error: error.message 
+        });
+    }
+});
+
+// Rota para deletar um bucket (deve estar vazio)
+app.delete('/bucket/:bucket', async (req, res) => {
+    const { access_key, secret_key } = req.headers;
+    const { bucket } = req.params;
+    
+    if (!access_key || !secret_key || !bucket) {
+        return res.status(400).json({ 
+            success: false, 
+            message: 'Parâmetros inválidos' 
+        });
+    }
+
+    try {
+        // Configurar o cliente S3 com as credenciais
+        const s3 = new AWS.S3({
+            accessKeyId: access_key,
+            secretAccessKey: secret_key,
+            region: 'us-east-1'
+        });
+        
+        // Deletar o bucket
+        await s3.deleteBucket({
+            Bucket: bucket
+        }).promise();
+        
+        res.json({ 
+            success: true, 
+            message: `Bucket ${bucket} deletado com sucesso` 
+        });
+    } catch (error) {
+        console.error(`Erro ao deletar bucket ${bucket}:`, error);
+        res.status(500).json({ 
+            success: false, 
+            error: error.message 
+        });
     }
 });
 

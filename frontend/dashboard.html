@@ -100,7 +100,7 @@
                                 </div>
                                 
                                 <!-- Download Buttons -->
-                                <div class="flex flex-col md:flex-row gap-4">
+                                <div class="flex flex-col md:flex-row gap-4 mb-4">
                                     <button id="downloadSelected" 
                                         class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition duration-200 flex items-center justify-center"
                                         disabled 
@@ -114,6 +114,24 @@
                                         data-tooltip="Baixar todo o bucket">
                                         <i class="fas fa-cloud-download-alt mr-2"></i>
                                         <span>Download Todo o Bucket</span>
+                                    </button>
+                                </div>
+                                
+                                <!-- Delete Buttons -->
+                                <div class="flex flex-col md:flex-row gap-4">
+                                    <button id="deleteSelected" 
+                                        class="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-4 rounded-lg transition duration-200 flex items-center justify-center"
+                                        disabled 
+                                        data-tooltip="Deletar arquivos selecionados">
+                                        <i class="fas fa-trash-alt mr-2"></i>
+                                        <span>Deletar Selecionados</span>
+                                    </button>
+                                    <button id="deleteBucket" 
+                                        class="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-4 rounded-lg transition duration-200 flex items-center justify-center"
+                                        disabled 
+                                        data-tooltip="Deletar bucket atual (deve estar vazio)">
+                                        <i class="fas fa-trash mr-2"></i>
+                                        <span>Deletar Bucket</span>
                                     </button>
                                 </div>
                             </div>
