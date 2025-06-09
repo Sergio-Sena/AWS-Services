@@ -1,82 +1,71 @@
-# S3 Explorer
+# AWS S3 Explorer
 
-Uma aplicação web para gerenciar buckets e objetos no Amazon S3.
-
-## Visão Geral
-
-O S3 Explorer permite aos usuários:
-- Autenticar com credenciais AWS
-- Listar e criar buckets S3
-- Navegar por objetos e "pastas" dentro dos buckets
-- Fazer upload de arquivos para buckets
-- Fazer download de objetos individuais ou em lote
+Aplicação para explorar e gerenciar buckets e objetos do Amazon S3 com interface moderna em Next.js.
 
 ## Estrutura do Projeto
 
-```
-Automação S3/
-├── backend/       # Servidor Node.js/Express
-├── frontend/      # Interface web HTML/CSS/JS
-├── docs/          # Documentação
-├── CHANGELOG.md   # Registro de alterações
-├── LICENSE        # Licença do projeto
-├── README.md      # Este arquivo
-└── SECURITY.md    # Políticas de segurança
-```
+- `backend/`: API Node.js/Express para interagir com a AWS S3
+- `frontend-next/`: Interface web moderna usando Next.js
 
-## Requisitos
-
-- Node.js 14.x ou superior
-- Navegador web moderno
-- Credenciais AWS com permissões para S3
-
-## Instalação
+## Como Executar
 
 ### Backend
 
-```bash
-cd backend
-npm install
-cp .env.example .env
-# Configure suas variáveis de ambiente no arquivo .env
-npm start
-```
+1. Entre na pasta do backend:
+   ```
+   cd backend
+   ```
 
-### Frontend
+2. Instale as dependências:
+   ```
+   npm install
+   ```
 
-O frontend é estático e não requer instalação. Basta abrir o arquivo `frontend/index.html` em um navegador ou servir os arquivos com um servidor web.
+3. Configure o arquivo `.env` (já existe um exemplo em `.env.example`):
+   ```
+   PORT=8000
+   NODE_ENV=development
+   ```
 
-## Uso
+4. Inicie o servidor:
+   ```
+   npm start
+   ```
 
-1. Abra a aplicação no navegador
-2. Faça login com suas credenciais AWS
-3. Navegue pelos buckets e objetos
-4. Use os botões para criar buckets, fazer upload e download de arquivos
+O backend estará disponível em `http://localhost:8000`.
 
-## Documentação
+### Frontend Next.js
 
-- [Manual do Usuário](docs/MANUAL.md)
-- [Documentação da API](docs/API.md)
-- [Guia de Desenvolvimento](docs/DESENVOLVIMENTO.md)
-- [Documentação do Backend](backend/README.md)
-- [Documentação do Frontend](frontend/README.md)
-- [Guia de Contribuição](CONTRIBUTING.md)
-- [Políticas de Segurança](SECURITY.md)
+1. Entre na pasta do frontend-next:
+   ```
+   cd frontend-next
+   ```
+
+2. Instale as dependências:
+   ```
+   npm install
+   ```
+
+3. Inicie o servidor de desenvolvimento:
+   ```
+   npm run dev
+   ```
+
+O frontend Next.js estará disponível em `http://localhost:3000`.
+
+## Conexão entre Frontend e Backend
+
+O frontend se conecta ao backend através da API REST. Certifique-se de que:
+
+1. O backend esteja em execução na porta 8000
+2. As configurações CORS no backend permitam requisições do frontend
+3. A URL da API no frontend está configurada em `.env.local` como `NEXT_PUBLIC_API_URL=http://localhost:8000`
 
 ## Funcionalidades
 
-- **Autenticação**: Login seguro com credenciais AWS
-- **Gerenciamento de Buckets**: Listar e criar buckets S3
-- **Navegação de Objetos**: Explorar objetos e "pastas" dentro dos buckets
-- **Upload de Arquivos**: Enviar arquivos para buckets S3
-- **Download de Objetos**: Baixar objetos individuais ou em lote
-
-## Segurança
-
-- As credenciais AWS são armazenadas apenas localmente no navegador
-- As credenciais são enviadas apenas para a AWS, nunca para servidores de terceiros
-- Recomendamos usar credenciais com permissões mínimas necessárias
-
-## Licença
-
-Este projeto está licenciado sob a [MIT License](LICENSE).
+- Autenticação com credenciais AWS (Access Key e Secret Key)
+- Listagem de buckets S3
+- Navegação pelos objetos dentro dos buckets
+- Upload e download de arquivos
+- Criação de novos buckets
+- Exclusão de objetos e buckets

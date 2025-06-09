@@ -4,7 +4,6 @@
 .env.development.local
 .env.test.local
 .env.production.local
-*.config.js
 
 # Dependências
 node_modules/
@@ -13,6 +12,7 @@ yarn-debug.log
 yarn-error.log
 
 # Arquivos de build
+.next/
 dist/
 build/
 out/
@@ -20,6 +20,8 @@ out/
 # Arquivos de download temporários
 backend/downloads/*
 !backend/downloads/.gitkeep
+backend/uploads/*
+!backend/uploads/.gitkeep
 
 # Logs
 logs
@@ -53,11 +55,3 @@ debug-*.js
 *.temp
 *.bak
 *.cache
--p/
-
-# Scripts de manutenção local
-fix-*.bat
-fix-*.sh
-fix-*.md
-commit-*.bat
-commit-*.sh

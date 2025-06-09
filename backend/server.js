@@ -6,8 +6,8 @@ const app = express();
 
 // Middleware
 app.use(cors({
-    origin: '*',
-    methods: ['GET', 'POST', 'DELETE'],  // Adicione DELETE aqui
+    origin: ['http://localhost:3000', 'http://localhost:8000', '*'],
+    methods: ['GET', 'POST', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'access_key', 'secret_key']
 }));
 
