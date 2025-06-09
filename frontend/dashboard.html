@@ -6,156 +6,218 @@
     <title>S3 Explorer - Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap">
     <link rel="stylesheet" href="styles.css">
 </head>
 <body class="gradient-bg min-h-screen text-white p-4">
-    <!-- Header com Navbar -->
-    <div class="mb-8 flex justify-between items-center">
-        <div class="flex items-center">
-            <i class="fas fa-cloud text-5xl neon-blue mr-4"></i>
-            <div>
-                <h1 class="text-3xl font-bold neon-blue">AWS S3 Explorer</h1>
-                <p class="text-slate-300 mt-1">Gerencie seus buckets e objetos</p>
+    <div class="dashboard-container flex flex-col md:flex-row">
+        <!-- Sidebar -->
+        <aside class="sidebar w-full md:w-64 md:min-h-screen p-4 transition-all duration-300">
+            <div class="neon-border rounded-xl p-4 h-full">
+                <div class="flex items-center justify-between mb-6">
+                    <div class="flex items-center">
+                        <i class="fas fa-cloud text-3xl neon-blue mr-3"></i>
+                        <h2 class="text-xl font-bold neon-blue">S3 Explorer</h2>
+                    </div>
+                    <button id="toggleSidebar" class="md:hidden text-slate-400 hover:text-white">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                </div>
+                
+                <div class="text-center mb-6">
+                    <i class="fas fa-folder text-4xl neon-blue mb-3"></i>
+                    <h2 class="text-2xl font-bold neon-blue">Seus Buckets S3</h2>
+                </div>
+                
+                <div id="bucketsList" class="space-y-3 max-h-[calc(100vh-20rem)] overflow-y-auto custom-scrollbar">
+                    <!-- Loading placeholder para buckets -->
+                    <div class="animate-pulse">
+                        <div class="h-10 bg-slate-700 rounded-lg mb-2"></div>
+                        <div class="h-10 bg-slate-700 rounded-lg mb-2"></div>
+                        <div class="h-10 bg-slate-700 rounded-lg"></div>
+                    </div>
+                </div>
+                
+                <div class="mt-6 pt-6 border-t border-slate-700">
+                    <button id="createBucketBtn" 
+                        class="neon-button w-full py-3 px-4 rounded-lg flex items-center justify-center click-effect">
+                        <i class="fas fa-plus-circle mr-2"></i>
+                        <span>Criar Novo Bucket</span>
+                    </button>
+                </div>
+                
+                <div class="mt-6 pt-6 border-t border-slate-700">
+                    <div class="flex flex-col space-y-2">
+                        <a href="aws-services.html" 
+                           class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition duration-200 flex items-center justify-center hover-lift">
+                            <i class="fas fa-th-large mr-2"></i>
+                            <span>Serviços AWS</span>
+                        </a>
+                        <button id="logoutBtn" 
+                                class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg transition duration-200 flex items-center justify-center hover-lift">
+                                <i class="fas fa-sign-out-alt mr-2"></i>
+                                <span>Logout</span>
+                        </button>
+                    </div>
+                </div>
             </div>
-        </div>
-        <div class="flex items-center space-x-3">
-            <a href="aws-services.html" 
-               class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition duration-200 flex items-center"
-               data-tooltip="Voltar para serviços AWS">
-                <i class="fas fa-th-large mr-2"></i>
-                <span class="hidden md:inline">Serviços AWS</span>
-            </a>
-            <button id="logoutBtn" 
-                    class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg transition duration-200 flex items-center"
-                    data-tooltip="Sair da conta">
-                    <i class="fas fa-sign-out-alt mr-2"></i>
-                    <span class="hidden md:inline">Logout</span>
-            </button>
-        </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content flex-1 p-4">
+            <!-- Header -->
+            <header class="mb-6">
+                <div class="neon-border rounded-xl p-4">
+                    <div class="flex flex-col md:flex-row md:items-center md:justify-between">
+                        <div class="mb-4 md:mb-0">
+                            <h1 class="text-2xl font-bold neon-blue">AWS S3 Explorer</h1>
+                            <p class="text-slate-300">Gerencie seus buckets e objetos</p>
+                        </div>
+                        
+                        <div class="flex items-center space-x-3">
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <i class="fas fa-search text-slate-400"></i>
+                                </div>
+                                <input type="text" id="prefixFilter" 
+                                    class="w-full md:w-64 bg-slate-700 bg-opacity-70 border border-slate-600 rounded-lg pl-10 p-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all hover:border-blue-400"
+                                    placeholder="Filtrar por pasta">
+                            </div>
+                            
+                            <div class="view-toggle hidden md:flex bg-slate-700 rounded-lg p-1">
+                                <button class="view-toggle-btn active p-2 rounded-md" data-view="list">
+                                    <i class="fas fa-list text-white"></i>
+                                </button>
+                                <button class="view-toggle-btn p-2 rounded-md" data-view="grid">
+                                    <i class="fas fa-th-large text-slate-400"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Stats Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                <div class="neon-border rounded-xl p-4 hover-lift">
+                    <div class="flex items-center">
+                        <div class="rounded-full bg-blue-500 bg-opacity-20 p-3 mr-4">
+                            <i class="fas fa-folder text-2xl neon-blue"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-sm text-slate-300">Bucket Atual</h3>
+                            <p id="currentBucketStat" class="text-xl font-bold neon-blue">-</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="neon-border rounded-xl p-4 hover-lift">
+                    <div class="flex items-center">
+                        <div class="rounded-full bg-green-500 bg-opacity-20 p-3 mr-4">
+                            <i class="fas fa-file text-2xl neon-green"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-sm text-slate-300">Objetos</h3>
+                            <p id="objectCountStat" class="text-xl font-bold neon-green">-</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="neon-border rounded-xl p-4 hover-lift">
+                    <div class="flex items-center">
+                        <div class="rounded-full bg-purple-500 bg-opacity-20 p-3 mr-4">
+                            <i class="fas fa-database text-2xl neon-purple"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-sm text-slate-300">Armazenamento</h3>
+                            <p id="storageStat" class="text-xl font-bold neon-purple">-</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Objects Container -->
+            <div class="neon-border rounded-xl p-6 mb-6">
+                <div id="objectsList">
+                    <div class="text-center mb-6">
+                        <i class="fas fa-box text-4xl neon-blue mb-3"></i>
+                        <h3 class="text-2xl font-bold neon-blue">Selecione um bucket para ver seu conteúdo</h3>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <!-- Loading placeholder para objetos -->
+                        <div class="animate-pulse">
+                            <div class="h-8 bg-slate-700 rounded-lg mb-2"></div>
+                            <div class="h-8 bg-slate-700 rounded-lg mb-2"></div>
+                            <div class="h-8 bg-slate-700 rounded-lg"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="neon-border rounded-xl p-6">
+                <div class="text-center mb-6">
+                    <i class="fas fa-exchange-alt text-4xl neon-blue mb-3"></i>
+                    <h3 class="text-2xl font-bold neon-blue">Opções de Arquivo</h3>
+                </div>
+                
+                <!-- Upload Button -->
+                <div class="mb-4">
+                    <button id="uploadFilesBtn" 
+                        class="neon-button w-full py-3 px-4 rounded-lg flex items-center justify-center click-effect"
+                        data-tooltip="Enviar arquivos para este bucket">
+                        <i class="fas fa-cloud-upload-alt mr-2"></i>
+                        <span>Enviar Arquivos</span>
+                    </button>
+                </div>
+                
+                <!-- Download Buttons -->
+                <div class="flex flex-col md:flex-row gap-4 mb-4">
+                    <button id="downloadSelected" 
+                        class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition duration-200 flex items-center justify-center hover-lift"
+                        disabled 
+                        data-tooltip="Baixar arquivos selecionados">
+                        <i class="fas fa-check-square mr-2"></i>
+                        <span>Download Selecionados</span>
+                    </button>
+                    <button id="downloadAll" 
+                        class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition duration-200 flex items-center justify-center hover-lift"
+                        disabled 
+                        data-tooltip="Baixar todo o bucket">
+                        <i class="fas fa-cloud-download-alt mr-2"></i>
+                        <span>Download Todo o Bucket</span>
+                    </button>
+                </div>
+                
+                <!-- Delete Buttons -->
+                <div class="flex flex-col md:flex-row gap-4">
+                    <button id="deleteSelected" 
+                        class="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-4 rounded-lg transition duration-200 flex items-center justify-center disabled:bg-red-900 disabled:opacity-60 disabled:cursor-not-allowed hover-lift"
+                        disabled 
+                        data-tooltip="Deletar arquivos selecionados">
+                        <i class="fas fa-trash-alt mr-2"></i>
+                        <span>Deletar Selecionados</span>
+                        <i class="fas fa-lock ml-2 delete-lock-icon"></i>
+                    </button>
+                    <button id="deleteBucket" 
+                        class="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-4 rounded-lg transition duration-200 flex items-center justify-center disabled:bg-red-900 disabled:opacity-60 disabled:cursor-not-allowed hover-lift"
+                        disabled 
+                        data-tooltip="Deletar bucket atual (deve estar vazio)">
+                        <i class="fas fa-trash mr-2"></i>
+                        <span>Deletar Bucket</span>
+                        <i class="fas fa-lock ml-2 delete-lock-icon"></i>
+                    </button>
+                </div>
+            </div>
+        </main>
     </div>
-
-    <!-- Main Content -->
-    <main class="grid grid-cols-1 md:grid-cols-4 gap-6">
-                <!-- Buckets Sidebar -->
-                <div class="md:col-span-1">
-                    <div class="bg-slate-800 bg-opacity-70 backdrop-blur-md rounded-xl p-8 shadow-xl neon-border">
-                        <div class="text-center mb-6">
-                            <i class="fas fa-folder text-4xl neon-blue mb-3"></i>
-                            <h2 class="text-2xl font-bold neon-blue">Seus Buckets S3</h2>
-                        </div>
-                        <div id="bucketsList" class="space-y-3 max-h-[calc(100vh-20rem)] overflow-y-auto custom-scrollbar">
-                            <!-- Loading placeholder para buckets -->
-                            <div class="animate-pulse">
-                                <div class="h-10 bg-slate-700 rounded-lg mb-2"></div>
-                                <div class="h-10 bg-slate-700 rounded-lg mb-2"></div>
-                                <div class="h-10 bg-slate-700 rounded-lg"></div>
-                            </div>
-                        </div>
-                        <div class="mt-6 pt-6 border-t border-slate-700">
-                            <button id="createBucketBtn" 
-                                class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-lg transition duration-200 flex items-center justify-center">
-                                <i class="fas fa-plus-circle mr-2"></i>
-                                <span>Criar Novo Bucket</span>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Content Area -->
-                <div class="md:col-span-3">
-                    <div class="bg-slate-800 bg-opacity-70 backdrop-blur-md rounded-xl p-8 shadow-xl neon-border">
-                        <!-- Objects List -->
-                        <div id="objectsList" class="mb-8">
-                            <div class="text-center mb-6">
-                                <i class="fas fa-box text-4xl neon-blue mb-3"></i>
-                                <h3 class="text-2xl font-bold neon-blue">Selecione um bucket para ver seu conteúdo</h3>
-                            </div>
-                            <div class="overflow-x-auto">
-                                <!-- Loading placeholder para objetos -->
-                                <div class="animate-pulse">
-                                    <div class="h-8 bg-slate-700 rounded-lg mb-2"></div>
-                                    <div class="h-8 bg-slate-700 rounded-lg mb-2"></div>
-                                    <div class="h-8 bg-slate-700 rounded-lg"></div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Upload e Download Options -->
-                        <div class="border-t border-slate-700 pt-6">
-                            <div class="text-center mb-6">
-                                <i class="fas fa-exchange-alt text-4xl neon-blue mb-3"></i>
-                                <h3 class="text-2xl font-bold neon-blue">Opções de Arquivo</h3>
-                            </div>
-                            <div class="space-y-6">
-                                <div class="relative">
-                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                        <i class="fas fa-search text-slate-400"></i>
-                                    </div>
-                                    <input type="text" id="prefixFilter" 
-                                        class="w-full bg-slate-700 border border-slate-600 rounded-lg pl-10 p-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                        placeholder="Filtrar por pasta"
-                                        data-tooltip="Digite para filtrar por pasta">
-                                </div>
-                                
-                                <!-- Upload Button -->
-                                <div class="mb-4">
-                                    <button id="uploadFilesBtn" 
-                                        class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-lg transition duration-200 flex items-center justify-center"
-                                        data-tooltip="Enviar arquivos para este bucket">
-                                        <i class="fas fa-cloud-upload-alt mr-2"></i>
-                                        <span>Enviar Arquivos</span>
-                                    </button>
-                                </div>
-                                
-                                <!-- Download Buttons -->
-                                <div class="flex flex-col md:flex-row gap-4 mb-4">
-                                    <button id="downloadSelected" 
-                                        class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition duration-200 flex items-center justify-center"
-                                        disabled 
-                                        data-tooltip="Baixar arquivos selecionados">
-                                        <i class="fas fa-check-square mr-2"></i>
-                                        <span>Download Selecionados</span>
-                                    </button>
-                                    <button id="downloadAll" 
-                                        class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition duration-200 flex items-center justify-center"
-                                        disabled 
-                                        data-tooltip="Baixar todo o bucket">
-                                        <i class="fas fa-cloud-download-alt mr-2"></i>
-                                        <span>Download Todo o Bucket</span>
-                                    </button>
-                                </div>
-                                
-                                <!-- Delete Buttons -->
-                                <div class="flex flex-col md:flex-row gap-4">
-                                    <button id="deleteSelected" 
-                                        class="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-4 rounded-lg transition duration-200 flex items-center justify-center disabled:bg-red-900 disabled:opacity-60 disabled:cursor-not-allowed"
-                                        disabled 
-                                        data-tooltip="Deletar arquivos selecionados">
-                                        <i class="fas fa-trash-alt mr-2"></i>
-                                        <span>Deletar Selecionados</span>
-                                        <i class="fas fa-lock ml-2 delete-lock-icon"></i>
-                                    </button>
-                                    <button id="deleteBucket" 
-                                        class="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-4 rounded-lg transition duration-200 flex items-center justify-center disabled:bg-red-900 disabled:opacity-60 disabled:cursor-not-allowed"
-                                        disabled 
-                                        data-tooltip="Deletar bucket atual (deve estar vazio)">
-                                        <i class="fas fa-trash mr-2"></i>
-                                        <span>Deletar Bucket</span>
-                                        <i class="fas fa-lock ml-2 delete-lock-icon"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </main>
     
     <!-- Help Text -->
     <div class="mt-6 text-center text-sm text-slate-400">
         <p>Precisa de ajuda para gerenciar seus buckets S3?</p>
         <a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/Welcome.html" 
            target="_blank"
-           class="text-blue-400 hover:text-blue-300 transition-colors">
+           class="text-blue-400 hover:text-blue-300 transition-colors hover-glow">
             Consulte a documentação do Amazon S3
         </a>
     </div>
@@ -165,9 +227,11 @@
         <p class="mt-4 text-lg">Processando...</p>
     </div>
 
+    <div id="notification-container"></div>
+
     <!-- Modal para criar bucket -->
-    <div id="createBucketModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center hidden">
-        <div class="bg-slate-800 rounded-xl p-8 shadow-xl neon-border max-w-md w-full mx-4">
+    <div id="createBucketModal" class="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm z-50 flex items-center justify-center hidden">
+        <div class="neon-border rounded-xl p-8 max-w-md w-full mx-4 animate-fade-in">
             <div class="flex justify-between items-center mb-6">
                 <h3 class="text-2xl font-bold neon-blue">Criar Novo Bucket</h3>
                 <button id="closeBucketModal" class="text-slate-400 hover:text-white">
@@ -178,14 +242,14 @@
                 <div class="mb-6">
                     <label for="bucketName" class="block text-sm font-medium text-slate-300 mb-1">Nome do Bucket</label>
                     <input type="text" id="bucketName" 
-                        class="w-full bg-slate-700 border border-slate-600 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        class="w-full bg-slate-700 bg-opacity-70 border border-slate-600 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all hover:border-blue-400"
                         placeholder="meu-bucket-unico" required>
                     <p class="text-xs text-slate-400 mt-1">O nome deve ser único globalmente e seguir as regras de nomenclatura da AWS.</p>
                 </div>
                 <div class="mb-6">
                     <label for="bucketRegion" class="block text-sm font-medium text-slate-300 mb-1">Região</label>
                     <select id="bucketRegion" 
-                        class="w-full bg-slate-700 border border-slate-600 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        class="w-full bg-slate-700 bg-opacity-70 border border-slate-600 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all hover:border-blue-400">
                         <option value="us-east-1">US East (N. Virginia)</option>
                         <option value="us-east-2">US East (Ohio)</option>
                         <option value="us-west-1">US West (N. California)</option>
@@ -197,11 +261,11 @@
                 </div>
                 <div class="flex justify-end">
                     <button type="button" id="cancelBucketBtn" 
-                        class="bg-slate-600 hover:bg-slate-700 text-white font-bold py-2 px-4 rounded-lg transition duration-200 mr-2">
+                        class="bg-slate-600 hover:bg-slate-700 text-white font-bold py-2 px-4 rounded-lg transition duration-200 mr-2 hover-lift click-effect">
                         Cancelar
                     </button>
                     <button type="submit" 
-                        class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg transition duration-200">
+                        class="neon-button py-2 px-4 rounded-lg click-effect">
                         Criar Bucket
                     </button>
                 </div>
@@ -210,8 +274,8 @@
     </div>
 
     <!-- Modal para upload de arquivos -->
-    <div id="uploadModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center hidden">
-        <div class="bg-slate-800 rounded-xl p-8 shadow-xl neon-border max-w-md w-full mx-4">
+    <div id="uploadModal" class="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm z-50 flex items-center justify-center hidden">
+        <div class="neon-border rounded-xl p-8 max-w-md w-full mx-4 animate-fade-in">
             <div class="flex justify-between items-center mb-6">
                 <h3 class="text-2xl font-bold neon-blue">Enviar Arquivos</h3>
                 <button id="closeUploadModal" class="text-slate-400 hover:text-white">
@@ -224,7 +288,7 @@
                     <div class="border-2 border-dashed border-slate-600 rounded-lg p-6 text-center hover:border-blue-500 transition-colors">
                         <input type="file" id="fileUpload" multiple class="hidden">
                         <label for="fileUpload" class="cursor-pointer">
-                            <i class="fas fa-cloud-upload-alt text-4xl text-slate-400 mb-3"></i>
+                            <i class="fas fa-cloud-upload-alt text-4xl text-slate-400 mb-3 block"></i>
                             <p class="text-slate-300">Arraste arquivos aqui ou clique para selecionar</p>
                             <p class="text-xs text-slate-400 mt-2">Tamanho máximo: 100MB por arquivo</p>
                         </label>
@@ -236,17 +300,17 @@
                 <div class="mb-6">
                     <label for="uploadPrefix" class="block text-sm font-medium text-slate-300 mb-1">Pasta de destino (opcional)</label>
                     <input type="text" id="uploadPrefix" 
-                        class="w-full bg-slate-700 border border-slate-600 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        class="w-full bg-slate-700 bg-opacity-70 border border-slate-600 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all hover:border-blue-400"
                         placeholder="pasta/subpasta/">
                     <p class="text-xs text-slate-400 mt-1">Deixe em branco para enviar para a raiz do bucket.</p>
                 </div>
                 <div class="flex justify-end">
                     <button type="button" id="cancelUploadBtn" 
-                        class="bg-slate-600 hover:bg-slate-700 text-white font-bold py-2 px-4 rounded-lg transition duration-200 mr-2">
+                        class="bg-slate-600 hover:bg-slate-700 text-white font-bold py-2 px-4 rounded-lg transition duration-200 mr-2 hover-lift click-effect">
                         Cancelar
                     </button>
                     <button type="submit" 
-                        class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg transition duration-200">
+                        class="neon-button py-2 px-4 rounded-lg click-effect">
                         Enviar
                     </button>
                 </div>
@@ -254,6 +318,98 @@
         </div>
     </div>
 
+    <script>
+        // Função para mostrar notificações
+        function showNotification(message, type = 'success') {
+            const container = document.getElementById('notification-container');
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            
+            notification.innerHTML = `
+                <div class="notification-icon">
+                    <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i>
+                </div>
+                <div class="notification-content">
+                    <p>${message}</p>
+                </div>
+                <button class="notification-close ml-4">
+                    <i class="fas fa-times"></i>
+                </button>
+            `;
+            
+            container.appendChild(notification);
+            
+            // Mostrar com animação
+            setTimeout(() => {
+                notification.classList.add('show');
+            }, 10);
+            
+            // Configurar botão de fechar
+            const closeBtn = notification.querySelector('.notification-close');
+            closeBtn.addEventListener('click', () => {
+                notification.classList.remove('show');
+                setTimeout(() => {
+                    container.removeChild(notification);
+                }, 300);
+            });
+            
+            // Auto-fechar após 5 segundos
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.classList.remove('show');
+                    setTimeout(() => {
+                        if (notification.parentNode) {
+                            container.removeChild(notification);
+                        }
+                    }, 300);
+                }
+            }, 5000);
+        }
+        
+        // Toggle para visualização em grade/lista
+        document.addEventListener('DOMContentLoaded', () => {
+            const viewToggleBtns = document.querySelectorAll('.view-toggle-btn');
+            
+            viewToggleBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    // Remover classe active de todos os botões
+                    viewToggleBtns.forEach(b => {
+                        b.classList.remove('active', 'bg-slate-600');
+                        b.querySelector('i').classList.remove('text-white');
+                        b.querySelector('i').classList.add('text-slate-400');
+                    });
+                    
+                    // Adicionar classe active ao botão clicado
+                    btn.classList.add('active', 'bg-slate-600');
+                    btn.querySelector('i').classList.remove('text-slate-400');
+                    btn.querySelector('i').classList.add('text-white');
+                    
+                    // Alternar visualização
+                    const view = btn.getAttribute('data-view');
+                    const objectsContainer = document.getElementById('objectsList');
+                    
+                    if (view === 'grid') {
+                        objectsContainer.classList.add('grid-view');
+                        objectsContainer.classList.remove('list-view');
+                    } else {
+                        objectsContainer.classList.add('list-view');
+                        objectsContainer.classList.remove('grid-view');
+                    }
+                });
+            });
+            
+            // Toggle sidebar em dispositivos móveis
+            const toggleSidebarBtn = document.getElementById('toggleSidebar');
+            const sidebar = document.querySelector('.sidebar');
+            
+            if (toggleSidebarBtn && sidebar) {
+                toggleSidebarBtn.addEventListener('click', () => {
+                    sidebar.classList.toggle('hidden');
+                });
+            }
+        });
+    </script>
+
     <script src="dashboard.js" defer></script>
 </body>
-</html> 
+</html>

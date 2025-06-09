@@ -6,16 +6,18 @@
     <title>S3 Explorer - Login</title>
     <script src="https://cdn.tailwindcss.com"></script> 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"> 
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap">
     <link rel="stylesheet" href="styles.css">
-
-    <!-- Script do Google Identity Services removido -->
 </head>
 <body class="gradient-bg min-h-screen flex items-center justify-center text-white p-4">
-    <div class="w-full max-w-md">
-        <div class="bg-slate-800 bg-opacity-70 backdrop-blur-md rounded-xl p-8 shadow-xl neon-border">
-            <!-- Header -->
+    <div class="w-full max-w-md relative z-10">
+        <div class="neon-border rounded-xl p-8 animate-fade-in">
+            <!-- Header com animação -->
             <div class="text-center mb-8">
-                <i class="fas fa-cloud text-5xl neon-blue mb-4"></i>
+                <div class="logo-animation relative w-24 h-24 mx-auto mb-4">
+                    <i class="fas fa-cloud text-5xl neon-blue absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 animate-pulse-glow"></i>
+                    <div class="logo-particles"></div>
+                </div>
                 <h1 class="text-3xl font-bold neon-blue">AWS Services Dashboard</h1>
                 <p class="text-slate-300 mt-2">
                     Insira suas credenciais AWS
@@ -39,7 +41,7 @@
                             id="username"
                             name="username"
                             required
-                            class="w-full bg-slate-700 border border-slate-600 rounded-lg pl-10 pr-10 p-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            class="w-full bg-slate-700 bg-opacity-70 border border-slate-600 rounded-lg pl-10 pr-10 p-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all hover:border-blue-400"
                             placeholder="Credenciais não são armazenadas"
                         />
                         <div
@@ -67,7 +69,7 @@
                             id="password"
                             name="password"
                             required
-                            class="w-full bg-slate-700 border border-slate-600 rounded-lg pl-10 pr-10 p-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            class="w-full bg-slate-700 bg-opacity-70 border border-slate-600 rounded-lg pl-10 pr-10 p-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all hover:border-blue-400"
                             placeholder="Credenciais não são armazenadas"
                         />
                         <div
@@ -81,22 +83,19 @@
                 <div>
                     <button
                         type="submit"
-                        class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition duration-200 flex items-center justify-center"
+                        class="neon-button w-full py-3 px-4 rounded-lg flex items-center justify-center click-effect"
                     >
                         <i class="fas fa-sign-in-alt mr-2"></i> Sign In
                     </button>
                 </div>
             </form>
-            <!-- Separador removido -->
-            <!-- Botão do Google removido -->
-            
         </div>
         <!-- Help Text -->
-        <div class="mt-6 text-center text-sm text-slate-400">
+        <div class="mt-6 text-center text-sm text-slate-400 animate-fade-in" style="animation-delay: 0.3s;">
             <p>Precisa de ajuda para encontrar suas credenciais?</p>
             <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_access-keys.html" 
                target="_blank"
-               class="text-blue-400 hover:text-blue-300 transition-colors"
+               class="text-blue-400 hover:text-blue-300 transition-colors hover-glow"
             >
                 Consulte a documentação da AWS
             </a>
@@ -108,116 +107,61 @@
         <p class="mt-4 text-lg">Conectando...</p>
     </div>
     
+    <div id="notification-container"></div>
+    
     <div id="errorMessage" class="hidden bg-red-500 text-white p-3 rounded-lg mt-4 text-center">
         Credenciais inválidas. Por favor, tente novamente.
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const form = document.getElementById('loginForm');
-            const errorMessage = document.getElementById('errorMessage');
-            const loading = document.getElementById('loading');
-            const togglePassword = document.getElementById('togglePassword');
-            const passwordInput = document.getElementById('password');
-            const toggleUsername = document.getElementById('toggleUsername');
-            const usernameInput = document.getElementById('username');
-
-            // Funcionalidade para mostrar/esconder senha
-            if (togglePassword && passwordInput) {
-                togglePassword.addEventListener('click', () => {
-                    const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-                    passwordInput.setAttribute('type', type);
-                    
-                    // Alterna o ícone entre olho e olho riscado
-                    const icon = togglePassword.querySelector('i');
-                    icon.classList.toggle('fa-eye');
-                    icon.classList.toggle('fa-eye-slash');
-                });
-            }
+        // Função para mostrar notificações
+        function showNotification(message, type = 'success') {
+            const container = document.getElementById('notification-container');
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
             
-            // Funcionalidade para mostrar/esconder access key
-            if (toggleUsername && usernameInput) {
-                toggleUsername.addEventListener('click', () => {
-                    const type = usernameInput.getAttribute('type') === 'password' ? 'text' : 'password';
-                    usernameInput.setAttribute('type', type);
-                    
-                    // Alterna o ícone entre olho e olho riscado
-                    const icon = toggleUsername.querySelector('i');
-                    icon.classList.toggle('fa-eye');
-                    icon.classList.toggle('fa-eye-slash');
-                });
-            }
-
-            form.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                errorMessage.classList.add('hidden');
-                loading.style.display = 'flex';
-
-                const accessKey = document.getElementById('username').value;
-                const secretKey = document.getElementById('password').value;
-
-                try {
-                    const response = await fetch('http://localhost:8000/auth', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({
-                            access_key: accessKey,
-                            secret_key: secretKey
-                        })
-                    });
-
-                    if (!response.ok) {
-                        throw new Error('Credenciais inválidas');
-                    }
-
-                    const data = await response.json();
-                    
-                    // Salvar credenciais
-                    localStorage.setItem('s3_access_key', accessKey);
-                    localStorage.setItem('s3_secret_key', secretKey);
-                    
-                    // Redirecionar para a página especificada na resposta ou para o dashboard por padrão
-                    window.location.href = data.redirect || 'dashboard.html';
-
-                } catch (error) {
-                    console.error('Erro:', error);
-                    errorMessage.classList.remove('hidden');
-                } finally {
-                    loading.style.display = 'none';
-                }
+            notification.innerHTML = `
+                <div class="notification-icon">
+                    <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i>
+                </div>
+                <div class="notification-content">
+                    <p>${message}</p>
+                </div>
+                <button class="notification-close ml-4">
+                    <i class="fas fa-times"></i>
+                </button>
+            `;
+            
+            container.appendChild(notification);
+            
+            // Mostrar com animação
+            setTimeout(() => {
+                notification.classList.add('show');
+            }, 10);
+            
+            // Configurar botão de fechar
+            const closeBtn = notification.querySelector('.notification-close');
+            closeBtn.addEventListener('click', () => {
+                notification.classList.remove('show');
+                setTimeout(() => {
+                    container.removeChild(notification);
+                }, 300);
             });
-        });
-
-        // Função de callback do Google Sign-In removida
-    </script>
-    <script>
-        // Função simples para testar se o sistema está funcionando
-        function testSystemStatus() {
-            console.log('Sistema funcionando normalmente');
-            alert('Sistema funcionando normalmente');
+            
+            // Auto-fechar após 5 segundos
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.classList.remove('show');
+                    setTimeout(() => {
+                        if (notification.parentNode) {
+                            container.removeChild(notification);
+                        }
+                    }, 300);
+                }
+            }, 5000);
         }
-        
-        // Adicionar botão de teste mais visível e clicável
-        document.addEventListener('DOMContentLoaded', () => {
-            const testButton = document.createElement('button');
-            testButton.textContent = 'Testar Sistema';
-            testButton.style.position = 'fixed';
-            testButton.style.bottom = '10px';
-            testButton.style.right = '10px';
-            testButton.style.zIndex = '9999';
-            testButton.style.padding = '10px 15px';
-            testButton.style.backgroundColor = '#3b82f6';
-            testButton.style.color = 'white';
-            testButton.style.border = 'none';
-            testButton.style.borderRadius = '5px';
-            testButton.style.cursor = 'pointer';
-            testButton.onclick = testSystemStatus;
-            document.body.appendChild(testButton);
-        });
     </script>
     
-    
+    <script src="login.js"></script>
 </body>
 </html>

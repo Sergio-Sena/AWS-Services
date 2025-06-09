@@ -192,10 +192,10 @@ document.addEventListener('DOMContentLoaded', () => {
             .sort((a, b) => a.Name.localeCompare(b.Name))
             .map(bucket => `
                 <button 
-                    class="bucket-item w-full text-left p-3 rounded-lg bg-slate-700 hover:bg-slate-600 transition-colors flex items-center space-x-2 ${currentBucket === bucket.Name ? 'ring-2 ring-blue-500' : ''}"
+                    class="bucket-item w-full text-left p-3 rounded-lg bg-slate-700 hover:bg-slate-600 transition-colors flex items-center space-x-2 neon-border-hover ${currentBucket === bucket.Name ? 'neon-border-active' : ''}"
                     data-bucket="${bucket.Name}">
-                    <i class="fas fa-folder text-blue-400"></i>
-                    <span class="truncate">${bucket.Name}</span>
+                    <i class="fas fa-folder text-blue-400 mr-2"></i>
+                    <span class="truncate neon-blue">${bucket.Name}</span>
                 </button>
             `)
             .join('');
@@ -291,9 +291,9 @@ document.addEventListener('DOMContentLoaded', () => {
             let path = '';
             
             breadcrumbsHtml = `
-                <div class="flex flex-wrap items-center mb-4 bg-slate-700 p-2 rounded-lg overflow-x-auto">
-                    <button class="text-blue-400 hover:underline flex items-center" data-prefix="">
-                        <i class="fas fa-home mr-1"></i> Raiz
+                <div class="flex flex-wrap items-center mb-4 bg-slate-700 p-2 rounded-lg overflow-x-auto neon-border">
+                    <button class="breadcrumb-item text-blue-400 hover:text-blue-300 hover:underline flex items-center" data-prefix="">
+                        <i class="fas fa-home mr-1 neon-blue"></i> <span class="neon-blue">Raiz</span>
                     </button>
             `;
             
@@ -301,8 +301,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 path += part + '/';
                 breadcrumbsHtml += `
                     <span class="mx-2 text-slate-400">/</span>
-                    <button class="text-blue-400 hover:underline truncate" data-prefix="${path}">
-                        ${part}
+                    <button class="breadcrumb-item text-blue-400 hover:text-blue-300 hover:underline truncate" data-prefix="${path}">
+                        <span class="neon-blue">${part}</span>
                     </button>
                 `;
             });
@@ -441,14 +441,13 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         // Para breadcrumbs
-        document.querySelectorAll('[data-prefix]:not(.prefix-checkbox):not(.folder-name)').forEach(button => {
-            if (!button.classList.contains('delete-prefix-btn')) {
-                button.addEventListener('click', () => {
-                    const prefix = button.getAttribute('data-prefix');
-                    currentPrefix = prefix;
-                    loadObjects(currentBucket, prefix);
-                });
-            }
+        document.querySelectorAll('.breadcrumb-item').forEach(button => {
+            button.addEventListener('click', () => {
+                const prefix = button.getAttribute('data-prefix');
+                console.log('Navegando para o prefixo:', prefix);
+                currentPrefix = prefix;
+                loadObjects(currentBucket, prefix);
+            });
         });
 
         // Para seleção de objetos
