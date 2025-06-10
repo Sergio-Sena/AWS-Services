@@ -10,6 +10,7 @@
     "test-dashboard": "node test-dashboard.js"
   },
   "dependencies": {
+    "archiver": "^7.0.1",
     "aws-sdk": "^2.1450.0",
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",

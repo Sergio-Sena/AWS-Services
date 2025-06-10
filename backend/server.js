@@ -131,10 +131,151 @@ app.get('/objects/:bucket', async (req, res) => {
     }
 });
 
-// Importar serviço de download
+// Rota para obter o tamanho total do bucket
+app.get('/bucket-size/:bucket', async (req, res) => {
+    const { access_key, secret_key } = req.headers;
+    const { bucket } = req.params;
+
+    if (!access_key || !secret_key) {
+        return res.status(400).json({ 
+            success: false, 
+            message: 'Credenciais não fornecidas nos headers' 
+        });
+    }
+
+    try {
+        const s3 = new AWS.S3({
+            accessKeyId: access_key,
+            secretAccessKey: secret_key,
+            region: 'us-east-1'
+        });
+
+        // Listar todos os objetos no bucket (sem delimiter)
+        const data = await s3.listObjectsV2({ 
+            Bucket: bucket,
+            MaxKeys: 1000 // Limitar para evitar timeouts
+        }).promise();
+        
+        // Calcular tamanho total
+        let totalSize = 0;
+        let totalObjects = 0;
+        
+        if (data.Contents) {
+            data.Contents.forEach(obj => {
+                totalSize += obj.Size || 0;
+                totalObjects++;
+            });
+        }
+        
+        // Verificar se há mais objetos (paginação)
+        let isTruncated = data.IsTruncated;
+        let nextContinuationToken = data.NextContinuationToken;
+        
+        // Limitar a 5 páginas para evitar timeouts
+        let pageCount = 1;
+        const maxPages = 5;
+        
+        while (isTruncated && pageCount < maxPages) {
+            const nextData = await s3.listObjectsV2({
+                Bucket: bucket,
+                MaxKeys: 1000,
+                ContinuationToken: nextContinuationToken
+            }).promise();
+            
+            if (nextData.Contents) {
+                nextData.Contents.forEach(obj => {
+                    totalSize += obj.Size || 0;
+                    totalObjects++;
+                });
+            }
+            
+            isTruncated = nextData.IsTruncated;
+            nextContinuationToken = nextData.NextContinuationToken;
+            pageCount++;
+        }
+        
+        return res.status(200).json({
+            success: true,
+            totalSize,
+            totalObjects,
+            isTruncated: isTruncated, // Indica se ainda há mais objetos
+            formattedSize: formatBytes(totalSize)
+        });
+    } catch (error) {
+        console.error(`Erro ao obter tamanho do bucket ${bucket}:`, error);
+        return res.status(500).json({
+            success: false,
+            message: `Erro ao obter tamanho do bucket ${bucket}`,
+            error: error.message
+        });
+    }
+});
+
+// Função auxiliar para formatar bytes
+function formatBytes(bytes, decimals = 2) {
+    if (!bytes) return '0 Bytes';
+    
+    const k = 1024;
+    const dm = decimals < 0 ? 0 : decimals;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+    
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+}
+
+// Importar serviços de download
 const { downloadS3Object } = require('./download-service');
+const { downloadS3Folder } = require('./download-folder-service');
 const path = require('path');
 const fs = require('fs');
+
+// Rota para download de uma pasta (como ZIP)
+app.get('/download-folder/:bucket/:prefix(*)', async (req, res) => {
+    // Tentar obter credenciais dos headers ou query params
+    let access_key = req.headers['access_key'];
+    let secret_key = req.headers['secret_key'];
+    
+    // Se não estiver nos headers, tentar nos query params
+    if (!access_key || !secret_key) {
+        access_key = req.query.access_token;
+        secret_key = req.query.secret_token;
+    }
+    
+    const { bucket } = req.params;
+    let { prefix } = req.params;
+    
+    if (!access_key || !secret_key) {
+        return res.status(400).json({ 
+            success: false, 
+            message: 'Credenciais não fornecidas nos headers ou query params' 
+        });
+    }
+
+    try {
+        // Decodificar o prefixo
+        prefix = decodeURIComponent(prefix);
+        
+        // Garantir que o prefixo termine com uma barra
+        if (!prefix.endsWith('/')) {
+            prefix += '/';
+        }
+        
+        // Fazer download da pasta como ZIP
+        await downloadS3Folder(access_key, secret_key, bucket, prefix, res);
+        
+    } catch (error) {
+        console.error(`Erro ao fazer download da pasta ${prefix}:`, error);
+        // Se o cabeçalho ainda não foi enviado
+        if (!res.headersSent) {
+            return res.status(500).json({
+                success: false,
+                message: `Erro ao fazer download da pasta`,
+                error: error.message
+            });
+        }
+    }
+});
 
 // Rota para download de um objeto
 app.get('/download/:bucket/:key(*)', async (req, res) => {
