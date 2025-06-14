@@ -8,7 +8,8 @@ const app = express();
 app.use(cors({
     origin: ['http://localhost:3000', 'http://localhost:8000', '*'],
     methods: ['GET', 'POST', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'access_key', 'secret_key']
+    allowedHeaders: ['Content-Type', 'access_key', 'secret_key'],
+    exposedHeaders: ['Content-Disposition']
 }));
 
 app.use(express.json());
@@ -230,6 +231,11 @@ const { downloadS3Folder } = require('./download-folder-service');
 const path = require('path');
 const fs = require('fs');
 
+// Importar rotas para download de bucket e múltiplos objetos
+const downloadRoutes = require('./routes');
+
+// As rotas para download de bucket e múltiplos objetos foram movidas para o arquivo routes.js
+
 // Rota para download de uma pasta (como ZIP)
 app.get('/download-folder/:bucket/:prefix(*)', async (req, res) => {
     // Tentar obter credenciais dos headers ou query params
@@ -405,6 +411,9 @@ app.post('/create-bucket', async (req, res) => {
 const multer = require('multer');
 const upload = multer({ dest: path.join(__dirname, 'uploads/') });
 
+// Importar serviço de upload multipart
+const { processLargeFile } = require('./multipart-upload-service');
+
 // Rota para upload de arquivos
 app.post('/upload/:bucket', upload.array('files'), async (req, res) => {
     try {
@@ -427,16 +436,33 @@ app.post('/upload/:bucket', upload.array('files'), async (req, res) => {
             region: 'us-east-1'
         });
         
+        // Limite para upload multipart (5MB)
+        const MULTIPART_THRESHOLD = 5 * 1024 * 1024;
+        
         // Upload de cada arquivo
         const uploadPromises = files.map(file => {
             const key = prefix ? `${prefix}${file.originalname}` : file.originalname;
             
-            return s3.upload({
-                Bucket: bucket,
-                Key: key,
-                Body: fs.createReadStream(file.path),
-                ContentType: file.mimetype
-            }).promise();
+            // Verificar se o arquivo é grande o suficiente para upload multipart
+            if (file.size > MULTIPART_THRESHOLD) {
+                // Usar upload multipart para arquivos grandes
+                return processLargeFile(
+                    access_key,
+                    secret_key,
+                    bucket,
+                    key,
+                    file.path,
+                    null // Sem callback de progresso no servidor
+                );
+            } else {
+                // Usar upload padrão para arquivos pequenos
+                return s3.upload({
+                    Bucket: bucket,
+                    Key: key,
+                    Body: fs.createReadStream(file.path),
+                    ContentType: file.mimetype
+                }).promise();
+            }
         });
         
         // Aguardar todos os uploads
@@ -583,6 +609,13 @@ app.delete('/bucket/:bucket', async (req, res) => {
         });
     }
 });
+
+// Importar rotas de upload multipart
+const multipartRoutes = require('./multipart-init-route');
+app.use(multipartRoutes);
+
+// Usar as rotas de download
+app.use(downloadRoutes);
 
 // Iniciar o servidor
 const PORT = process.env.PORT || 8000;
