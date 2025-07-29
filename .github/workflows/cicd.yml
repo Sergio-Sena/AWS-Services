@@ -8,6 +8,7 @@ on:
 
 env:
   NODE_VERSION: '18'
+  AWS_REGION: us-east-1
 
 jobs:
   # ==================== TESTES ====================
@@ -22,7 +23,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
 
       - name: Install Backend Dependencies
         run: |
@@ -34,25 +34,15 @@ jobs:
           cd frontend-next
           npm ci
 
-      - name: Run Backend Lint
-        run: |
-          cd backend
-          npm run lint || echo "Lint not configured, skipping..."
-
-      - name: Run Frontend Lint
-        run: |
-          cd frontend-next
-          npm run lint || echo "Lint not configured, skipping..."
-
       - name: Run Backend Tests
         run: |
           cd backend
-          npm test || echo "Tests not configured, skipping..."
+          npm test
 
       - name: Run Frontend Tests
         run: |
           cd frontend-next
-          npm test || echo "Tests not configured, skipping..."
+          npm test
 
   # ==================== BUILD ====================
   build:
@@ -67,27 +57,18 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
 
       - name: Build Backend
         run: |
           cd backend
           npm ci
-          echo "Backend build completed"
+          npm run build
 
       - name: Build Frontend
         run: |
           cd frontend-next
           npm ci
           npm run build
-
-      - name: Upload Build Artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: build-artifacts
-          path: |
-            frontend-next/.next/
-            backend/
 
   # ==================== DEPLOY PRODUCTION ====================
   deploy-prod:
@@ -100,12 +81,26 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Simulate Production Deploy
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Deploy Backend (Serverless)
         run: |
-          echo "🚀 Deploying to Production..."
-          echo "✅ Backend deployed successfully"
-          echo "✅ Frontend deployed successfully"
-          echo "✅ Health check passed"
+          cd backend
+          npm ci
+          npm install -g serverless
+          echo "🚀 Backend deployment simulated"
+
+      - name: Deploy Frontend (S3)
+        run: |
+          cd frontend-next
+          npm ci
+          npm run build
+          echo "🚀 Frontend deployment simulated"
 
       - name: Deployment Summary
         run: |
@@ -113,4 +108,5 @@ jobs:
           echo "- Environment: Production"
           echo "- Commit: ${{ github.sha }}"
           echo "- Branch: ${{ github.ref_name }}"
+          echo "- AWS Region: ${{ env.AWS_REGION }}"
           echo "- Status: Success ✅"
