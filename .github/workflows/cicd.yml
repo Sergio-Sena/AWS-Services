@@ -18,6 +18,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          submodules: recursive
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -27,12 +29,12 @@ jobs:
       - name: Install Backend Dependencies
         run: |
           cd backend
-          npm ci
+          npm install
 
       - name: Install Frontend Dependencies
         run: |
           cd frontend-next
-          npm ci
+          npm install
 
       - name: Run Backend Tests
         run: |
@@ -52,6 +54,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          submodules: recursive
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -61,13 +65,13 @@ jobs:
       - name: Build Backend
         run: |
           cd backend
-          npm ci
+          npm install
           npm run build
 
       - name: Build Frontend
         run: |
           cd frontend-next
-          npm ci
+          npm install
           npm run build
 
   # ==================== DEPLOY PRODUCTION ====================
@@ -80,6 +84,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          submodules: recursive
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -91,14 +97,14 @@ jobs:
       - name: Deploy Backend (Serverless)
         run: |
           cd backend
-          npm ci
+          npm install
           npm install -g serverless
           echo "🚀 Backend deployment simulated"
 
       - name: Deploy Frontend (S3)
         run: |
           cd frontend-next
-          npm ci
+          npm install
           npm run build
           echo "🚀 Frontend deployment simulated"
 
