@@ -1,0 +1,27 @@
+{
+  "builds": [
+    {
+      "src": "package.json",
+      "use": "@vercel/next"
+    }
+  ],
+  "env": {
+    "NEXT_PUBLIC_API_URL": "https://api.aws-services.com"
+  },
+  "github": {
+    "enabled": true
+  },
+  "git": {
+    "deploymentEnabled": {
+      "main": true,
+      "test": true,
+      "dev": true
+    }
+  },
+  "regions": ["iad1"],
+  "functions": {
+    "pages/api/**/*.js": {
+      "maxDuration": 30
+    }
+  }
+}

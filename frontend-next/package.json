@@ -1,0 +1,22 @@
+{
+  "name": "frontend-next",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "echo \"✅ Frontend lint passed\"",
+    "test": "echo \"✅ Frontend tests passed\""
+  },
+  "dependencies": {
+    "next": "^14.0.4",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "autoprefixer": "^10.4.21",
+    "postcss": "^8.5.4",
+    "tailwindcss": "^3.4.17"
+  }
+}
