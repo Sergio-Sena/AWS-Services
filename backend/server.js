@@ -2,6 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const AWS = require('aws-sdk');
+const serverless = require('serverless-http');
 const app = express();
 
 // Middleware
@@ -504,9 +505,23 @@ app.get('/api/billing/exchange-rate', async (req, res) => {
     }
 });
 
-// Iniciar o servidor
-const PORT = process.env.PORT || 8000;
-app.listen(PORT, () => {
-    console.log(`Servidor rodando na porta ${PORT}`);
-    console.log(`Ambiente: ${process.env.NODE_ENV}`);
+// Health check endpoint
+app.get('/health', (req, res) => {
+    res.json({ 
+        status: 'ok', 
+        stage: process.env.STAGE || 'local',
+        timestamp: new Date().toISOString()
+    });
 });
+
+// Export para Lambda
+module.exports.handler = serverless(app);
+
+// Iniciar o servidor localmente (apenas se não for Lambda)
+if (process.env.NODE_ENV !== 'production') {
+    const PORT = process.env.PORT || 8000;
+    app.listen(PORT, () => {
+        console.log(`Servidor rodando na porta ${PORT}`);
+        console.log(`Ambiente: ${process.env.NODE_ENV}`);
+    });
+}
