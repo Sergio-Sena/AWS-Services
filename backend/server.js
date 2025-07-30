@@ -15,8 +15,8 @@ app.use(cors({
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Importar handlers Lambda
-const { getUploadUrl, getCompressionStatus } = require('./handlers/imageCompression');
+// Importar multer para upload de arquivos
+const multer = require('multer');
 
 // Rota de autenticação
 app.post('/auth', async (req, res) => {
@@ -88,25 +88,142 @@ app.get('/buckets', async (req, res) => {
     }
 });
 
-// Rotas Lambda
-app.post('/lambda/image-upload-url', async (req, res) => {
-    const event = {
-        headers: req.headers,
-        body: JSON.stringify(req.body)
-    };
+// Rota para listar objetos de um bucket
+app.get('/objects/:bucket', async (req, res) => {
+    const access_key = req.headers['access_key'];
+    const secret_key = req.headers['secret_key'];
+    const { bucket } = req.params;
+    const { prefix } = req.query;
     
-    const result = await getUploadUrl(event);
-    res.status(result.statusCode).set(result.headers || {}).json(JSON.parse(result.body));
+    if (!access_key || !secret_key) {
+        return res.status(400).json({ 
+            success: false, 
+            message: 'Credenciais não fornecidas nos headers' 
+        });
+    }
+
+    try {
+        const s3 = new AWS.S3({
+            accessKeyId: access_key,
+            secretAccessKey: secret_key,
+            region: 'us-east-1'
+        });
+
+        const params = {
+            Bucket: bucket,
+            Delimiter: '/'
+        };
+        
+        if (prefix) {
+            params.Prefix = prefix;
+        }
+
+        const data = await s3.listObjectsV2(params).promise();
+        
+        return res.status(200).json({
+            success: true,
+            objects: data.Contents || [],
+            prefixes: data.CommonPrefixes || [],
+            bucket: bucket,
+            prefix: prefix || ''
+        });
+    } catch (error) {
+        console.error('Erro ao listar objetos:', error);
+        return res.status(500).json({
+            success: false,
+            message: 'Erro ao listar objetos',
+            error: error.message
+        });
+    }
 });
 
-app.get('/lambda/compression-status/:bucket/:key(*)', async (req, res) => {
-    const event = {
-        headers: req.headers,
-        pathParameters: req.params
-    };
+// Rota para upload de arquivos
+app.post('/upload/:bucket', require('multer')().array('files'), async (req, res) => {
+    const access_key = req.headers['access_key'];
+    const secret_key = req.headers['secret_key'];
+    const { bucket } = req.params;
+    const { prefix } = req.body;
     
-    const result = await getCompressionStatus(event);
-    res.status(result.statusCode).set(result.headers || {}).json(JSON.parse(result.body));
+    if (!access_key || !secret_key) {
+        return res.status(400).json({ 
+            success: false, 
+            message: 'Credenciais não fornecidas nos headers' 
+        });
+    }
+
+    try {
+        const s3 = new AWS.S3({
+            accessKeyId: access_key,
+            secretAccessKey: secret_key,
+            region: 'us-east-1'
+        });
+
+        const uploadPromises = req.files.map(file => {
+            const key = prefix ? `${prefix}${file.originalname}` : file.originalname;
+            return s3.upload({
+                Bucket: bucket,
+                Key: key,
+                Body: file.buffer,
+                ContentType: file.mimetype
+            }).promise();
+        });
+
+        const results = await Promise.all(uploadPromises);
+        
+        return res.status(200).json({
+            success: true,
+            message: `${req.files.length} arquivo(s) enviado(s) com sucesso`,
+            results
+        });
+    } catch (error) {
+        console.error('Erro ao fazer upload:', error);
+        return res.status(500).json({
+            success: false,
+            message: 'Erro ao fazer upload',
+            error: error.message
+        });
+    }
+});
+
+// Rota para download de objeto
+app.get('/download/:bucket/:key(*)', async (req, res) => {
+    const access_key = req.headers['access_key'];
+    const secret_key = req.headers['secret_key'];
+    const { bucket, key } = req.params;
+    
+    if (!access_key || !secret_key) {
+        return res.status(400).json({ 
+            success: false, 
+            message: 'Credenciais não fornecidas nos headers' 
+        });
+    }
+
+    try {
+        const s3 = new AWS.S3({
+            accessKeyId: access_key,
+            secretAccessKey: secret_key,
+            region: 'us-east-1'
+        });
+
+        const data = await s3.getObject({
+            Bucket: bucket,
+            Key: decodeURIComponent(key)
+        }).promise();
+        
+        res.set({
+            'Content-Type': data.ContentType || 'application/octet-stream',
+            'Content-Disposition': `attachment; filename="${key.split('/').pop()}"`
+        });
+        
+        return res.send(data.Body);
+    } catch (error) {
+        console.error('Erro ao fazer download:', error);
+        return res.status(500).json({
+            success: false,
+            message: 'Erro ao fazer download',
+            error: error.message
+        });
+    }
 });
 
 // Iniciar o servidor
