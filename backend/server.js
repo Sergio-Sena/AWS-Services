@@ -434,6 +434,41 @@ app.post('/api/dynamodb/operation', express.json(), async (req, res) => {
     }
 });
 
+// Rotas CloudFront isoladas
+app.get('/api/cloudfront/distributions', async (req, res) => {
+    const access_key = req.headers['access_key'];
+    const secret_key = req.headers['secret_key'];
+    
+    if (!access_key || !secret_key) {
+        return res.status(400).json({ 
+            success: false, 
+            message: 'Credenciais não fornecidas nos headers' 
+        });
+    }
+
+    try {
+        const { listDistributions } = require('./handlers/cloudFrontManagement');
+        const event = { credentials: { accessKey: access_key, secretKey: secret_key } };
+        const result = await listDistributions(event);
+        
+        res.status(result.statusCode).json(JSON.parse(result.body));
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+app.post('/api/cloudfront/operation', express.json(), async (req, res) => {
+    try {
+        const { distributionOperation } = require('./handlers/cloudFrontManagement');
+        const event = { body: JSON.stringify(req.body) };
+        const result = await distributionOperation(event);
+        
+        res.status(result.statusCode).json(JSON.parse(result.body));
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
 // Iniciar o servidor
 const PORT = process.env.PORT || 8000;
 app.listen(PORT, () => {
