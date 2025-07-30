@@ -226,6 +226,19 @@ app.get('/download/:bucket/:key(*)', async (req, res) => {
     }
 });
 
+// Rota Lambda isolada
+app.post('/api/compress-image', express.json(), async (req, res) => {
+    try {
+        const { compressImage } = require('./handlers/imageCompression');
+        const event = { body: JSON.stringify(req.body) };
+        const result = await compressImage(event);
+        
+        res.status(result.statusCode).json(JSON.parse(result.body));
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
 // Iniciar o servidor
 const PORT = process.env.PORT || 8000;
 app.listen(PORT, () => {
