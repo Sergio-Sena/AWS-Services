@@ -1,4 +1,8 @@
-# AWS Services Dashboard
+# 🚀 AWS Services Dashboard
+
+**Versão**: v1.1.0 (Atual)  
+**Status**: ✅ Funcional com 7 módulos AWS  
+**Arquitetura**: Migração para Full AWS em andamento
 
 Uma aplicação web completa para gerenciar serviços AWS com interface moderna e dados reais da sua conta.
 
@@ -39,6 +43,13 @@ Uma aplicação web completa para gerenciar serviços AWS com interface moderna 
 - ✅ **Visualização de dados** simulados
 - ✅ **Interface consistente** com outros módulos
 
+### 🗄️ **Amazon RDS**
+- ✅ **Listagem de instâncias reais** + demo
+- ✅ **Informações completas**: Engine, classe, storage, Multi-AZ
+- ✅ **Operações demo**: Iniciar, Parar, Backup
+- ✅ **Badges REAL/DEMO** para identificação
+- ✅ **Interface neon-red** personalizada
+
 ### 🌐 **Amazon CloudFront**
 - ✅ **Listagem de distribuições reais** + demo
 - ✅ **Domínios personalizados** destacados
@@ -72,6 +83,7 @@ Uma aplicação web completa para gerenciar serviços AWS com interface moderna 
 ### **AWS Services**
 - **S3** - Armazenamento escalável e durável
 - **EC2** - Instâncias virtuais
+- **RDS** - Bancos de dados relacionais
 - **DynamoDB** - Banco NoSQL
 - **CloudFront** - CDN
 - **Cost Explorer** - Faturamento

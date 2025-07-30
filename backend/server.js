@@ -550,7 +550,8 @@ app.get('/health', (req, res) => {
 });
 
 // Export para Lambda
-module.exports.handler = serverless(app);
+const handler = serverless(app);
+module.exports = { handler };
 
 // Iniciar o servidor localmente (apenas se não for Lambda)
 if (process.env.NODE_ENV !== 'production') {
