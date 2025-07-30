@@ -226,6 +226,76 @@ app.get('/download/:bucket/:key(*)', async (req, res) => {
     }
 });
 
+// Rota para obter tamanho do bucket
+app.get('/bucket-size/:bucket', async (req, res) => {
+    const access_key = req.headers['access_key'];
+    const secret_key = req.headers['secret_key'];
+    const { bucket } = req.params;
+    
+    if (!access_key || !secret_key) {
+        return res.status(400).json({ 
+            success: false, 
+            message: 'Credenciais não fornecidas nos headers' 
+        });
+    }
+
+    try {
+        const s3 = new AWS.S3({
+            accessKeyId: access_key,
+            secretAccessKey: secret_key,
+            region: 'us-east-1'
+        });
+
+        let totalSize = 0;
+        let objectCount = 0;
+        let continuationToken = null;
+
+        do {
+            const params = {
+                Bucket: bucket,
+                MaxKeys: 1000
+            };
+            
+            if (continuationToken) {
+                params.ContinuationToken = continuationToken;
+            }
+
+            const data = await s3.listObjectsV2(params).promise();
+            
+            data.Contents.forEach(obj => {
+                totalSize += obj.Size;
+                objectCount++;
+            });
+            
+            continuationToken = data.NextContinuationToken;
+        } while (continuationToken);
+        
+        return res.status(200).json({
+            success: true,
+            bucket: bucket,
+            totalSize: totalSize,
+            objectCount: objectCount,
+            formattedSize: formatBytes(totalSize)
+        });
+    } catch (error) {
+        console.error('Erro ao obter tamanho do bucket:', error);
+        return res.status(500).json({
+            success: false,
+            message: 'Erro ao obter tamanho do bucket',
+            error: error.message
+        });
+    }
+});
+
+// Função auxiliar para formatar bytes
+function formatBytes(bytes) {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+}
+
 // Rota Lambda isolada
 app.post('/api/compress-image', express.json(), async (req, res) => {
     try {
