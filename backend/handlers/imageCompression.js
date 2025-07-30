@@ -60,12 +60,14 @@ module.exports.getUploadUrl = async (event) => {
     const s3Client = new AWS.S3({
       accessKeyId: access_key,
       secretAccessKey: secret_key,
-      region: 'us-east-1'
+      region: 'us-east-1',
+      signatureVersion: 'v4'
     });
     
     const key = `lambda-uploads/${Date.now()}-${fileName}`;
     
-    const uploadUrl = s3Client.getSignedUrl('putObject', {
+    // Gerar presigned URL sem CORS issues
+    const uploadUrl = await s3Client.getSignedUrlPromise('putObject', {
       Bucket: bucket,
       Key: key,
       ContentType: fileType,
