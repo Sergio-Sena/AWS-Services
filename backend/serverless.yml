@@ -1,0 +1,52 @@
+service: aws-services-api
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  region: us-east-1
+  stage: ${opt:stage, 'dev'}
+  environment:
+    STAGE: ${self:provider.stage}
+    NODE_ENV: production
+  timeout: 30
+  memorySize: 512
+
+functions:
+  api:
+    handler: server.handler
+    events:
+      - http:
+          path: /{proxy+}
+          method: ANY
+          cors:
+            origin: 
+              - https://aws-services.com
+              - https://test.aws-services.com
+              - https://dev.aws-services.com
+              - http://localhost:3000
+            headers:
+              - Content-Type
+              - Authorization
+              - access_key
+              - secret_key
+            allowCredentials: true
+
+custom:
+  customDomain:
+    domainName: api-${self:provider.stage}.aws-services.com
+    basePath: ''
+    stage: ${self:provider.stage}
+    createRoute53Record: true
+    certificateName: '*.aws-services.com'
+    hostedZoneId: ${env:HOSTED_ZONE_ID}
+
+plugins:
+  - serverless-domain-manager
+  - serverless-offline
+
+package:
+  exclude:
+    - node_modules/**
+    - .git/**
+    - .env
+    - README.md
