@@ -309,6 +309,96 @@ app.post('/api/compress-image', express.json(), async (req, res) => {
     }
 });
 
+// Rotas EC2 isoladas
+app.get('/api/ec2/instances', async (req, res) => {
+    const access_key = req.headers['access_key'];
+    const secret_key = req.headers['secret_key'];
+    
+    if (!access_key || !secret_key) {
+        return res.status(400).json({ 
+            success: false, 
+            message: 'Credenciais não fornecidas nos headers' 
+        });
+    }
+
+    try {
+        const ec2 = new AWS.EC2({
+            accessKeyId: access_key,
+            secretAccessKey: secret_key,
+            region: 'us-east-1'
+        });
+
+        const data = await ec2.describeInstances().promise();
+        
+        const instances = [];
+        data.Reservations.forEach(reservation => {
+            reservation.Instances.forEach(instance => {
+                instances.push({
+                    InstanceId: instance.InstanceId,
+                    InstanceType: instance.InstanceType,
+                    State: instance.State,
+                    PublicIpAddress: instance.PublicIpAddress,
+                    PrivateIpAddress: instance.PrivateIpAddress,
+                    LaunchTime: instance.LaunchTime,
+                    Tags: instance.Tags || []
+                });
+            });
+        });
+        
+        // Se não houver instâncias reais, adicionar demos
+        if (instances.length === 0) {
+            instances.push(
+                {
+                    InstanceId: 'demo-i-1234567890abcdef0',
+                    InstanceType: 't3.micro',
+                    State: { Name: 'running', Code: 16 },
+                    PublicIpAddress: '54.123.45.67',
+                    PrivateIpAddress: '10.0.1.100',
+                    LaunchTime: new Date(Date.now() - 86400000).toISOString(),
+                    Tags: [{ Key: 'Name', Value: 'Demo Web Server' }],
+                    isDemo: true
+                },
+                {
+                    InstanceId: 'demo-i-0987654321fedcba0',
+                    InstanceType: 't3.small',
+                    State: { Name: 'stopped', Code: 80 },
+                    PublicIpAddress: null,
+                    PrivateIpAddress: '10.0.1.101',
+                    LaunchTime: new Date(Date.now() - 172800000).toISOString(),
+                    Tags: [{ Key: 'Name', Value: 'Demo Database Server' }],
+                    isDemo: true
+                }
+            );
+        }
+        
+        return res.status(200).json({
+            success: true,
+            instances,
+            realCount: instances.filter(i => !i.isDemo).length,
+            demoCount: instances.filter(i => i.isDemo).length
+        });
+    } catch (error) {
+        console.error('Erro ao listar instâncias EC2:', error);
+        return res.status(500).json({
+            success: false,
+            message: 'Erro ao listar instâncias EC2',
+            error: error.message
+        });
+    }
+});
+
+app.post('/api/ec2/manage', express.json(), async (req, res) => {
+    try {
+        const { manageInstance } = require('./handlers/ec2Management');
+        const event = { body: JSON.stringify(req.body) };
+        const result = await manageInstance(event);
+        
+        res.status(result.statusCode).json(JSON.parse(result.body));
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
 // Iniciar o servidor
 const PORT = process.env.PORT || 8000;
 app.listen(PORT, () => {
