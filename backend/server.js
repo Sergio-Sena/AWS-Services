@@ -399,6 +399,41 @@ app.post('/api/ec2/manage', express.json(), async (req, res) => {
     }
 });
 
+// Rotas DynamoDB isoladas
+app.get('/api/dynamodb/tables', async (req, res) => {
+    const access_key = req.headers['access_key'];
+    const secret_key = req.headers['secret_key'];
+    
+    if (!access_key || !secret_key) {
+        return res.status(400).json({ 
+            success: false, 
+            message: 'Credenciais não fornecidas nos headers' 
+        });
+    }
+
+    try {
+        const { listTables } = require('./handlers/dynamoManagement');
+        const event = { credentials: { accessKey: access_key, secretKey: secret_key } };
+        const result = await listTables(event);
+        
+        res.status(result.statusCode).json(JSON.parse(result.body));
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+app.post('/api/dynamodb/operation', express.json(), async (req, res) => {
+    try {
+        const { tableOperation } = require('./handlers/dynamoManagement');
+        const event = { body: JSON.stringify(req.body) };
+        const result = await tableOperation(event);
+        
+        res.status(result.statusCode).json(JSON.parse(result.body));
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
 // Iniciar o servidor
 const PORT = process.env.PORT || 8000;
 app.listen(PORT, () => {
