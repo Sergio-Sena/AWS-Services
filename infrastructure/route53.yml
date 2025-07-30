@@ -1,0 +1,81 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'Route 53 configuration for AWS Services Dashboard'
+
+Parameters:
+  DomainName:
+    Type: String
+    Default: aws-services.com
+    Description: Base domain name
+
+Resources:
+  # Hosted Zone for aws-services.com
+  HostedZone:
+    Type: AWS::Route53::HostedZone
+    Properties:
+      Name: !Ref DomainName
+      HostedZoneConfig:
+        Comment: 'Hosted zone for AWS Services Dashboard'
+
+  # SSL Certificate for *.aws-services.com
+  SSLCertificate:
+    Type: AWS::CertificateManager::Certificate
+    Properties:
+      DomainName: !Ref DomainName
+      SubjectAlternativeNames:
+        - !Sub '*.${DomainName}'
+      ValidationMethod: DNS
+      DomainValidationOptions:
+        - DomainName: !Ref DomainName
+          HostedZoneId: !Ref HostedZone
+        - DomainName: !Sub '*.${DomainName}'
+          HostedZoneId: !Ref HostedZone
+
+  # Frontend Records (will point to Vercel)
+  ProdRecord:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: !Ref HostedZone
+      Name: !Ref DomainName
+      Type: CNAME
+      TTL: 300
+      ResourceRecords:
+        - cname.vercel-dns.com
+
+  TestRecord:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: !Ref HostedZone
+      Name: !Sub 'test.${DomainName}'
+      Type: CNAME
+      TTL: 300
+      ResourceRecords:
+        - cname.vercel-dns.com
+
+  DevRecord:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: !Ref HostedZone
+      Name: !Sub 'dev.${DomainName}'
+      Type: CNAME
+      TTL: 300
+      ResourceRecords:
+        - cname.vercel-dns.com
+
+Outputs:
+  HostedZoneId:
+    Description: 'Hosted Zone ID for aws-services.com'
+    Value: !Ref HostedZone
+    Export:
+      Name: !Sub '${AWS::StackName}-HostedZoneId'
+
+  SSLCertificateArn:
+    Description: 'SSL Certificate ARN for *.aws-services.com'
+    Value: !Ref SSLCertificate
+    Export:
+      Name: !Sub '${AWS::StackName}-SSLCertificateArn'
+
+  NameServers:
+    Description: 'Name servers for the hosted zone'
+    Value: !Join [',', !GetAtt HostedZone.NameServers]
+    Export:
+      Name: !Sub '${AWS::StackName}-NameServers'

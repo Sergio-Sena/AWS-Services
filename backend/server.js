@@ -505,6 +505,41 @@ app.get('/api/billing/exchange-rate', async (req, res) => {
     }
 });
 
+// Rotas RDS isoladas
+app.get('/api/rds/instances', async (req, res) => {
+    const access_key = req.headers['access_key'];
+    const secret_key = req.headers['secret_key'];
+    
+    if (!access_key || !secret_key) {
+        return res.status(400).json({ 
+            success: false, 
+            message: 'Credenciais não fornecidas nos headers' 
+        });
+    }
+
+    try {
+        const { listInstances } = require('./handlers/rdsManagement');
+        const event = { credentials: { accessKey: access_key, secretKey: secret_key } };
+        const result = await listInstances(event);
+        
+        res.status(result.statusCode).json(JSON.parse(result.body));
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+app.post('/api/rds/operation', express.json(), async (req, res) => {
+    try {
+        const { instanceOperation } = require('./handlers/rdsManagement');
+        const event = { body: JSON.stringify(req.body) };
+        const result = await instanceOperation(event);
+        
+        res.status(result.statusCode).json(JSON.parse(result.body));
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
 // Health check endpoint
 app.get('/health', (req, res) => {
     res.json({ 
