@@ -1,0 +1,54 @@
+# ⚡ GitLab CI/CD - AWS Services Dashboard
+stages:
+  - build
+  - deploy-backend
+  - deploy-frontend
+
+variables:
+  NODE_VERSION: "18"
+  SERVERLESS_STAGE: "prod"
+
+build_backend:
+  stage: build
+  image: node:18-alpine
+  script:
+    - cd backend
+    - npm ci
+    - npm run test || true
+  artifacts:
+    paths:
+      - backend/node_modules/
+    expire_in: 1 hour
+
+build_frontend:
+  stage: build
+  image: node:18-alpine
+  script:
+    - cd frontend-next
+    - npm ci
+    - npm run build
+  artifacts:
+    paths:
+      - frontend-next/.next/
+      - frontend-next/out/
+    expire_in: 1 hour
+
+deploy_serverless:
+  stage: deploy-backend
+  image: node:18-alpine
+  before_script:
+    - npm install -g serverless
+  script:
+    - cd backend
+    - sls deploy --stage $SERVERLESS_STAGE
+  only:
+    - main
+
+deploy_frontend_s3:
+  stage: deploy-frontend
+  image: amazon/aws-cli:latest
+  script:
+    - cd frontend-next
+    - aws s3 sync out/ s3://aws-services-dashboard-prod --delete
+  only:
+    - main
