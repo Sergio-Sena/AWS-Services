@@ -3,6 +3,7 @@ import { useRouter } from 'next/router';
 import Head from 'next/head';
 import Link from 'next/link';
 import { useAuth } from '../context/AuthContext';
+import apiService from '../services/api';
 
 export default function DynamoDB() {
     const router = useRouter();
@@ -25,18 +26,10 @@ export default function DynamoDB() {
         const loadTables = async () => {
             if (isAuthenticated && credentials?.accessKey && credentials?.secretKey) {
                 try {
-                    const response = await fetch('http://localhost:8000/api/dynamodb/tables', {
-                        method: 'GET',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'access_key': credentials.accessKey,
-                            'secret_key': credentials.secretKey
-                        }
-                    });
-                    const data = await response.json();
-                    if (data.success) {
-                        setTables(data.tables || []);
-                        console.log(`Encontradas ${data.realCount} tabelas reais e ${data.demoCount} demos`);
+                    const response = await apiService.getDynamoTables(credentials.accessKey, credentials.secretKey);
+                    if (response.success) {
+                        setTables(response.tables || []);
+                        console.log(`Encontradas ${response.realCount} tabelas reais e ${response.demoCount} demos`);
                     }
                 } catch (error) {
                     console.error('Erro ao carregar tabelas:', error);

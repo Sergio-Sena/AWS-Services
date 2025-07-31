@@ -1,0 +1,53 @@
+# Configuração de variáveis de ambiente por branch
+name: Environment Configuration
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        required: true
+        type: string
+    outputs:
+      api_url:
+        description: "API URL for the environment"
+        value: ${{ jobs.config.outputs.api_url }}
+      s3_bucket:
+        description: "S3 bucket for the environment"
+        value: ${{ jobs.config.outputs.s3_bucket }}
+      cloudfront_id:
+        description: "CloudFront distribution ID"
+        value: ${{ jobs.config.outputs.cloudfront_id }}
+
+jobs:
+  config:
+    runs-on: ubuntu-latest
+    outputs:
+      api_url: ${{ steps.set-config.outputs.api_url }}
+      s3_bucket: ${{ steps.set-config.outputs.s3_bucket }}
+      cloudfront_id: ${{ steps.set-config.outputs.cloudfront_id }}
+    
+    steps:
+      - name: Set Environment Configuration
+        id: set-config
+        run: |
+          case "${{ inputs.environment }}" in
+            "development")
+              echo "api_url=https://dev-api.aws-services.com" >> $GITHUB_OUTPUT
+              echo "s3_bucket=aws-services-dashboard-dev" >> $GITHUB_OUTPUT
+              echo "cloudfront_id=${{ secrets.CLOUDFRONT_DISTRIBUTION_ID_DEV }}" >> $GITHUB_OUTPUT
+              ;;
+            "test")
+              echo "api_url=https://test-api.aws-services.com" >> $GITHUB_OUTPUT
+              echo "s3_bucket=aws-services-dashboard-test" >> $GITHUB_OUTPUT
+              echo "cloudfront_id=${{ secrets.CLOUDFRONT_DISTRIBUTION_ID_TEST }}" >> $GITHUB_OUTPUT
+              ;;
+            "production")
+              echo "api_url=https://api.aws-services.com" >> $GITHUB_OUTPUT
+              echo "s3_bucket=aws-services-dashboard-prod" >> $GITHUB_OUTPUT
+              echo "cloudfront_id=${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }}" >> $GITHUB_OUTPUT
+              ;;
+            *)
+              echo "Unknown environment: ${{ inputs.environment }}"
+              exit 1
+              ;;
+          esac

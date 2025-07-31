@@ -1,8 +1,8 @@
 # 🚀 AWS Services Dashboard
 
-**Versão**: v1.1.0 (Atual)  
+**Versão**: v2.0.0 (Atual)  
 **Status**: ✅ Funcional com 7 módulos AWS  
-**Arquitetura**: Migração para Full AWS em andamento
+**Arquitetura**: Full AWS (S3 + CloudFront + Lambda)
 
 Uma aplicação web completa para gerenciar serviços AWS com interface moderna e dados reais da sua conta.
 
@@ -74,20 +74,21 @@ Uma aplicação web completa para gerenciar serviços AWS com interface moderna 
 - **Font Awesome** - Ícones
 
 ### **Backend**
-- **Node.js** - Runtime
-- **Express.js** - Framework web
+- **Node.js 18.x** - Runtime
+- **Serverless Framework** - Deploy
 - **AWS SDK v2** - Integração AWS
+- **Express.js** - Framework web
 - **Multer** - Upload de arquivos
-- **CORS** - Cross-origin requests
 
 ### **AWS Services**
-- **S3** - Armazenamento escalável e durável
+- **S3** - Armazenamento + Hosting estático
+- **CloudFront** - CDN global
+- **Lambda** - Backend serverless
+- **API Gateway** - REST API
 - **EC2** - Instâncias virtuais
 - **RDS** - Bancos de dados relacionais
 - **DynamoDB** - Banco NoSQL
-- **CloudFront** - CDN
 - **Cost Explorer** - Faturamento
-- **Lambda** - Computação serverless
 
 ## 📦 Instalação
 
@@ -119,8 +120,9 @@ npm run dev
 ```
 
 ### **Acessar**
-- Frontend: `http://localhost:3000`
-- Backend: `http://localhost:8000`
+- **Produção**: https://aws-services.sstechnologies-cloud.com
+- **Local Frontend**: http://localhost:3000
+- **Local Backend**: http://localhost:8000
 
 ## ⚙️ Configuração
 
@@ -207,19 +209,24 @@ npm start          # Servir build
 
 ## 🚀 Deploy
 
-### **Vercel (Frontend)**
+### **Automático (GitHub Actions)**
 ```bash
-cd frontend-next
-vercel --prod
+git add .
+git commit -m "feat: nova funcionalidade"
+git push origin main
+# Deploy automático para produção
 ```
 
-### **AWS EC2 (Backend)**
+### **Manual**
 ```bash
-# PM2 para produção
-npm install -g pm2
-pm2 start server.js --name aws-services
-pm2 startup
-pm2 save
+# Backend
+cd backend
+sls deploy --stage prod
+
+# Frontend
+cd frontend-next
+npm run build
+aws s3 sync out/ s3://aws-services-dashboard-prod --delete
 ```
 
 ## 🔒 Segurança
@@ -280,17 +287,15 @@ npm run dev
 ## 📈 Roadmap
 
 ### **Próximas Funcionalidades**
-- [ ] **RDS**: Gerenciamento de bancos
 - [ ] **SQS/SNS**: Mensageria
-- [ ] **CloudWatch**: Monitoramento
-- [ ] **Route 53**: DNS
+- [ ] **CloudWatch**: Monitoramento avançado
 - [ ] **IAM**: Usuários e permissões
+- [ ] **ECS/EKS**: Containers
 
 ### **Melhorias Técnicas**
 - [ ] Migração para AWS SDK v3
 - [ ] Testes automatizados
-- [ ] Docker containers
-- [ ] CI/CD pipeline
+- [ ] WAF + Security
 - [ ] Monitoramento APM
 
 ## 🤝 Contribuição

@@ -658,6 +658,50 @@ const apiService = {
       console.error(`Erro na requisição POST ${endpoint}:`, error);
       throw error;
     }
+  },
+
+  // Métodos para outros serviços AWS
+  getEC2Instances: async (accessKey, secretKey) => {
+    return apiService.get('/api/ec2/instances', {
+      'access_key': accessKey,
+      'secret_key': secretKey
+    });
+  },
+
+  getDynamoTables: async (accessKey, secretKey) => {
+    return apiService.get('/api/dynamodb/tables', {
+      'access_key': accessKey,
+      'secret_key': secretKey
+    });
+  },
+
+  getCloudFrontDistributions: async (accessKey, secretKey) => {
+    return apiService.get('/api/cloudfront/distributions', {
+      'access_key': accessKey,
+      'secret_key': secretKey
+    });
+  },
+
+  getRDSInstances: async (accessKey, secretKey) => {
+    return apiService.get('/api/rds/instances', {
+      'access_key': accessKey,
+      'secret_key': secretKey
+    });
+  },
+
+  getBillingInfo: async (accessKey, secretKey) => {
+    return apiService.get('/api/billing/info', {
+      'access_key': accessKey,
+      'secret_key': secretKey
+    });
+  },
+
+  getExchangeRate: async () => {
+    return apiService.get('/api/billing/exchange-rate');
+  },
+
+  compressImage: async (data) => {
+    return apiService.post('/api/compress-image', data);
   }
 };
 

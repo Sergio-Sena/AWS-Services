@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const AWS = require('aws-sdk');
 const { downloadBucket, downloadMultipleObjects } = require('./download-bucket-service');
+const { invalidateCache } = require('./handlers/cacheInvalidation');
 
 // Configurar CORS para as rotas
 router.use((req, res, next) => {
@@ -92,6 +93,80 @@ router.post('/download-multiple/:bucket', express.json(), async (req, res) => {
             });
         }
     }
+});
+
+// Rota para invalidação de cache do CloudFront
+router.post('/invalidate-cache', express.json(), async (req, res) => {
+    const access_key = req.headers['access_key'];
+    const secret_key = req.headers['secret_key'];
+    
+    if (!access_key || !secret_key) {
+        return res.status(400).json({ 
+            success: false, 
+            message: 'Credenciais não fornecidas nos headers' 
+        });
+    }
+    
+    const requestBody = {
+        ...req.body,
+        accessKey: access_key,
+        secretKey: secret_key
+    };
+    
+    const event = { body: JSON.stringify(requestBody) };
+    const result = await invalidateCache(event, {});
+    
+    res.status(result.statusCode).json(JSON.parse(result.body));
+});
+
+// Rota para verificar status de invalidação
+router.post('/invalidation-status', express.json(), async (req, res) => {
+    const access_key = req.headers['access_key'];
+    const secret_key = req.headers['secret_key'];
+    
+    if (!access_key || !secret_key) {
+        return res.status(400).json({ 
+            success: false, 
+            message: 'Credenciais não fornecidas nos headers' 
+        });
+    }
+    
+    const { getInvalidationStatus } = require('./handlers/cacheInvalidation');
+    const requestBody = {
+        ...req.body,
+        accessKey: access_key,
+        secretKey: secret_key
+    };
+    
+    const event = { body: JSON.stringify(requestBody) };
+    const result = await getInvalidationStatus(event, {});
+    
+    res.status(result.statusCode).json(JSON.parse(result.body));
+});
+
+// Rota para listar invalidações
+router.post('/list-invalidations', express.json(), async (req, res) => {
+    const access_key = req.headers['access_key'];
+    const secret_key = req.headers['secret_key'];
+    
+    if (!access_key || !secret_key) {
+        return res.status(400).json({ 
+            success: false, 
+            message: 'Credenciais não fornecidas nos headers' 
+        });
+    }
+    
+    const { listInvalidations } = require('./handlers/cacheInvalidation');
+    const requestBody = {
+        ...req.body,
+        accessKey: access_key,
+        secretKey: secret_key
+    };
+    
+    const event = { body: JSON.stringify(requestBody) };
+    const result = await listInvalidations(event, {});
+    
+    res.status(result.statusCode).json(JSON.parse(result.body));
 });
 
 module.exports = router;

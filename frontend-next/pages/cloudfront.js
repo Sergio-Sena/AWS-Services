@@ -3,6 +3,7 @@ import { useRouter } from 'next/router';
 import Head from 'next/head';
 import Link from 'next/link';
 import { useAuth } from '../context/AuthContext';
+import apiService from '../services/api';
 
 export default function CloudFront() {
     const router = useRouter();
@@ -24,18 +25,10 @@ export default function CloudFront() {
         const loadDistributions = async () => {
             if (isAuthenticated && credentials?.accessKey && credentials?.secretKey) {
                 try {
-                    const response = await fetch('http://localhost:8000/api/cloudfront/distributions', {
-                        method: 'GET',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'access_key': credentials.accessKey,
-                            'secret_key': credentials.secretKey
-                        }
-                    });
-                    const data = await response.json();
-                    if (data.success) {
-                        setDistributions(data.distributions || []);
-                        console.log(`Encontradas ${data.realCount} distribuições reais e ${data.demoCount} demos`);
+                    const response = await apiService.getCloudFrontDistributions(credentials.accessKey, credentials.secretKey);
+                    if (response.success) {
+                        setDistributions(response.distributions || []);
+                        console.log(`Encontradas ${response.realCount} distribuições reais e ${response.demoCount} demos`);
                     }
                 } catch (error) {
                     console.error('Erro ao carregar distribuições:', error);

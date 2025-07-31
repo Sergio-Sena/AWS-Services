@@ -1,13 +1,17 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  reactStrictMode: true,
-  swcMinify: true,
+  output: 'export',
+  trailingSlash: true,
+  images: {
+    unoptimized: true
+  },
   env: {
-    NEXT_PUBLIC_API_URL: process.env.VERCEL_GIT_COMMIT_REF === 'main' 
-      ? 'https://api.aws-services.com'
-      : process.env.VERCEL_GIT_COMMIT_REF === 'test'
-      ? 'https://api-test.aws-services.com'
-      : 'https://api-dev.aws-services.com'
+    NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL || (
+      process.env.NODE_ENV === 'production' 
+        ? 'https://ouv5xejnw3.execute-api.us-east-1.amazonaws.com/prod'
+        : 'http://localhost:8000'
+    ),
+    NEXT_PUBLIC_ENVIRONMENT: process.env.NEXT_PUBLIC_ENVIRONMENT || 'development'
   },
   async headers() {
     return [

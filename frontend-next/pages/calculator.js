@@ -3,6 +3,7 @@ import { useRouter } from 'next/router';
 import Head from 'next/head';
 import Link from 'next/link';
 import { useAuth } from '../context/AuthContext';
+import apiService from '../services/api';
 
 export default function Calculator() {
     const router = useRouter();
@@ -24,22 +25,10 @@ export default function Calculator() {
             if (isAuthenticated && credentials?.accessKey && credentials?.secretKey) {
                 try {
                     // Carregar informações de faturamento
-                    const billingResponse = await fetch('http://localhost:8000/api/billing/info', {
-                        method: 'GET',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'access_key': credentials.accessKey,
-                            'secret_key': credentials.secretKey
-                        }
-                    });
-                    const billingResult = await billingResponse.json();
+                    const billingResult = await apiService.getBillingInfo(credentials.accessKey, credentials.secretKey);
                     
                     // Carregar cotação
-                    const exchangeResponse = await fetch('http://localhost:8000/api/billing/exchange-rate', {
-                        method: 'GET',
-                        headers: { 'Content-Type': 'application/json' }
-                    });
-                    const exchangeResult = await exchangeResponse.json();
+                    const exchangeResult = await apiService.getExchangeRate();
                     
                     if (billingResult.success) {
                         setBillingData(billingResult.billing);

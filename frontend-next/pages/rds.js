@@ -12,7 +12,7 @@ export default function RDS({ showNotification }) {
   const [demoCount, setDemoCount] = useState(0);
   const [operationLoading, setOperationLoading] = useState({});
   const router = useRouter();
-  const { isAuthenticated, isLoading } = useAuth();
+  const { credentials, isAuthenticated, isLoading } = useAuth();
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
@@ -29,7 +29,7 @@ export default function RDS({ showNotification }) {
   const loadInstances = async () => {
     try {
       setLoading(true);
-      const response = await apiService.get('/api/rds/instances');
+      const response = await apiService.getRDSInstances(credentials.accessKey, credentials.secretKey);
       
       if (response.success) {
         setInstances(response.instances);

@@ -29,12 +29,12 @@ functions:
 
 # custom:
 #   customDomain:
-#     domainName: api-${self:provider.stage}.aws-services.com
+#     domainName: api-${self:provider.stage}.sstechnologies-cloud.com
 #     basePath: ''
 #     stage: ${self:provider.stage}
 #     createRoute53Record: true
-#     certificateName: '*.aws-services.com'
-#     hostedZoneId: ${env:HOSTED_ZONE_ID}
+#     certificateName: 'sstechnologies-cloud.com'
+#     hostedZoneId: Z07937031ROGP6XAEMPWJ
 
 plugins:
   # - serverless-domain-manager
@@ -42,7 +42,9 @@ plugins:
 
 package:
   exclude:
-    - node_modules/**
     - .git/**
     - .env
     - README.md
+    - test-*.js
+    - uploads/**
+    - downloads/**

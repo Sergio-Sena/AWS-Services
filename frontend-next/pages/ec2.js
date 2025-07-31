@@ -3,6 +3,7 @@ import { useRouter } from 'next/router';
 import Head from 'next/head';
 import Link from 'next/link';
 import { useAuth } from '../context/AuthContext';
+import apiService from '../services/api';
 
 export default function EC2() {
     const router = useRouter();
@@ -23,19 +24,11 @@ export default function EC2() {
         const loadInstances = async () => {
             if (isAuthenticated && credentials?.accessKey && credentials?.secretKey) {
                 try {
-                    const response = await fetch('http://localhost:8000/api/ec2/instances', {
-                        method: 'GET',
-                        headers: { 
-                            'Content-Type': 'application/json',
-                            'access_key': credentials.accessKey,
-                            'secret_key': credentials.secretKey
-                        }
-                    });
-                    const data = await response.json();
-                    if (data.success) {
-                        setInstances(data.instances || []);
-                        if (data.realCount > 0) {
-                            console.log(`Encontradas ${data.realCount} instâncias reais`);
+                    const response = await apiService.getEC2Instances(credentials.accessKey, credentials.secretKey);
+                    if (response.success) {
+                        setInstances(response.instances || []);
+                        if (response.realCount > 0) {
+                            console.log(`Encontradas ${response.realCount} instâncias reais`);
                         }
                     }
                 } catch (error) {

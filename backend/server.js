@@ -1,4 +1,7 @@
-require('dotenv').config();
+// Carregar dotenv apenas em desenvolvimento
+if (process.env.NODE_ENV !== 'production') {
+    require('dotenv').config();
+}
 const express = require('express');
 const cors = require('cors');
 const AWS = require('aws-sdk');
@@ -7,10 +10,17 @@ const app = express();
 
 // Middleware
 app.use(cors({
-    origin: ['http://localhost:3000', 'http://localhost:8000', '*'],
+    origin: [
+        'http://localhost:3000', 
+        'http://localhost:8000', 
+        'https://aws-services.sstechnologies-cloud.com',
+        'https://d1gsuffpry1o53.cloudfront.net',
+        '*'
+    ],
     methods: ['GET', 'POST', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'access_key', 'secret_key'],
-    exposedHeaders: ['Content-Disposition']
+    exposedHeaders: ['Content-Disposition'],
+    credentials: true
 }));
 
 app.use(express.json());
@@ -533,6 +543,31 @@ app.post('/api/rds/operation', express.json(), async (req, res) => {
         const { instanceOperation } = require('./handlers/rdsManagement');
         const event = { body: JSON.stringify(req.body) };
         const result = await instanceOperation(event);
+        
+        res.status(result.statusCode).json(JSON.parse(result.body));
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+app.post('/api/rds/connect', express.json(), async (req, res) => {
+    const access_key = req.headers['access_key'];
+    const secret_key = req.headers['secret_key'];
+    
+    if (!access_key || !secret_key) {
+        return res.status(400).json({ 
+            success: false, 
+            message: 'Credenciais não fornecidas nos headers' 
+        });
+    }
+
+    try {
+        const { connectAndListData } = require('./handlers/rdsManagement');
+        const event = { 
+            body: JSON.stringify(req.body),
+            credentials: { accessKey: access_key, secretKey: secret_key }
+        };
+        const result = await connectAndListData(event);
         
         res.status(result.statusCode).json(JSON.parse(result.body));
     } catch (error) {
