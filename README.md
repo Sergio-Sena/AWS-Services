@@ -1,302 +1,252 @@
-# 🚀 AWS Services Dashboard
+# ☁️ AWS Services Dashboard
 
-**Versão**: v2.0.0 (Atual)  
-**Status**: ✅ Funcional com 7 módulos AWS  
-**Arquitetura**: Full AWS (S3 + CloudFront + Lambda)
+[![Status](https://img.shields.io/badge/Status-✅%20Online-brightgreen)](https://aws-services.sstechnologies-cloud.com)
+[![Next.js](https://img.shields.io/badge/Next.js-14-black)](https://nextjs.org/)
+[![Node.js](https://img.shields.io/badge/Node.js-18-green)](https://nodejs.org/)
+[![AWS](https://img.shields.io/badge/AWS-Serverless-orange)](https://aws.amazon.com/)
+[![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-Uma aplicação web completa para gerenciar serviços AWS com interface moderna e dados reais da sua conta.
+> Gerencie seus serviços AWS com interface moderna e dados reais da sua conta.
 
-## 🚀 Funcionalidades
+**[🚀 Ver Demo](https://aws-services.sstechnologies-cloud.com)** | **[📖 Docs](docs/)** | **[🐛 Issues](../../issues)**
 
-### 📊 **Dashboard Principal**
-- Interface responsiva com design neon futurista
-- Autenticação segura com credenciais AWS
-- Navegação intuitiva entre módulos
-- Status em tempo real dos serviços
+---
 
-### 🗄️ **Amazon S3**
-- ✅ **Listagem de buckets reais** da conta AWS
-- ✅ **Upload de arquivos** com suporte a multipart
-- ✅ **Download individual** e em lote (ZIP)
-- ✅ **Navegação em pastas** com breadcrumb
-- ✅ **Informações detalhadas** (tamanho, data, tipo)
-- ✅ **Operações de exclusão** seguras
+## ✨ Features
 
-### ⚡ **AWS Lambda**
-- ✅ **Compactação de imagens** (demo)
-- ✅ **Seleção de módulos**: Sharp, ImageMagick, Jimp, Canvas
-- ✅ **Estatísticas simuladas** de performance
-- ✅ **Interface compatível** com outros módulos
-- ✅ **Feedback visual** detalhado
+| Serviço | Status | Funcionalidades |
+|---------|--------|-----------------|
+| **S3** | ✅ | Listagem de buckets, upload multipart, download ZIP, navegação em pastas |
+| **Lambda** | ✅ | Compactação de imagens (Sharp, ImageMagick, Jimp, Canvas) |
+| **EC2** | ✅ | Listagem de instâncias, ações (iniciar/parar/reiniciar), status em tempo real |
+| **DynamoDB** | ✅ | Listagem de tabelas, scan, put item, visualização de dados |
+| **RDS** | ✅ | Listagem de instâncias, operações (iniciar/parar/backup), Multi-AZ |
+| **CloudFront** | ✅ | Listagem de distribuições, invalidar cache, domínios personalizados |
+| **Cost Explorer** | ✅ | Faturamento real (USD → BRL), breakdown por serviço, última fatura |
 
-### 🖥️ **Amazon EC2**
-- ✅ **Listagem de instâncias reais** + demo
-- ✅ **Informações completas**: ID, tipo, IPs, status, tags
-- ✅ **Ações simuladas**: Iniciar, Parar, Reiniciar
-- ✅ **Indicadores visuais** de status
-- ✅ **Segurança**: Operações apenas em demos
+### 🎯 Destaques
+- **Dados Reais**: Integração direta com sua conta AWS
+- **Fallback Inteligente**: Dados demo quando serviços não disponíveis
+- **Interface Neon**: Design futurista responsivo
+- **Segurança**: Credenciais não persistidas, operações destrutivas apenas em demos
+- **Autenticação**: Login com credenciais AWS (Access Key + Secret Key)
 
-### 🗃️ **Amazon DynamoDB**
-- ✅ **Listagem de tabelas reais** + demo
-- ✅ **Informações detalhadas**: Status, itens, tamanho, capacidade
-- ✅ **Operações demo**: Scan, Put Item
-- ✅ **Visualização de dados** simulados
-- ✅ **Interface consistente** com outros módulos
+---
 
-### 🗄️ **Amazon RDS**
-- ✅ **Listagem de instâncias reais** + demo
-- ✅ **Informações completas**: Engine, classe, storage, Multi-AZ
-- ✅ **Operações demo**: Iniciar, Parar, Backup
-- ✅ **Badges REAL/DEMO** para identificação
-- ✅ **Interface neon-red** personalizada
-
-### 🌐 **Amazon CloudFront**
-- ✅ **Listagem de distribuições reais** + demo
-- ✅ **Domínios personalizados** destacados
-- ✅ **Informações completas**: Status, origem, aliases
-- ✅ **Operações demo**: Invalidar cache, Habilitar/Desabilitar
-- ✅ **Pills coloridas** para domínios
-
-### 💰 **Calculadora AWS**
-- ✅ **Dados reais de faturamento** via Cost Explorer
-- ✅ **Conversão automática** USD → BRL
-- ✅ **Última fatura** e **fatura atual**
-- ✅ **Breakdown por serviço** AWS
-- ✅ **Fallback inteligente** para demo
-- ✅ **Cotação em tempo real**
-
-## 🛠️ Tecnologias
+## 🛠️ Tech Stack
 
 ### **Frontend**
-- **Next.js 14** - Framework React
-- **Tailwind CSS** - Estilização
-- **Context API** - Gerenciamento de estado
+- **Next.js 14** - Framework React com SSR
+- **Tailwind CSS** - Utility-first CSS
+- **Context API** - State management
 - **Font Awesome** - Ícones
 
 ### **Backend**
-- **Node.js 18.x** - Runtime
-- **Serverless Framework** - Deploy
-- **AWS SDK v2** - Integração AWS
+- **Node.js 18** - Runtime
 - **Express.js** - Framework web
+- **AWS SDK v2** - Integração AWS
+- **Serverless Framework** - Deploy
 - **Multer** - Upload de arquivos
 
 ### **AWS Services**
-- **S3** - Armazenamento + Hosting estático
+- **S3** - Storage + Static hosting
 - **CloudFront** - CDN global
-- **Lambda** - Backend serverless
+- **Lambda** - Serverless backend
 - **API Gateway** - REST API
-- **EC2** - Instâncias virtuais
-- **RDS** - Bancos de dados relacionais
-- **DynamoDB** - Banco NoSQL
-- **Cost Explorer** - Faturamento
+- **EC2, RDS, DynamoDB** - Recursos gerenciados
 
-## 📦 Instalação
+---
+
+## 🚀 Quick Start
 
 ### **Pré-requisitos**
 - Node.js 18+
-- Credenciais AWS válidas
+- Credenciais AWS com permissões IAM
 - Git
 
-### **Clone o repositório**
+### **1. Clone o repositório**
 ```bash
 git clone https://github.com/Sergio-Sena/AWS-Services.git
 cd AWS-Services
 ```
 
-### **Backend**
+### **2. Backend**
 ```bash
 cd backend
 npm install
 cp .env.example .env
-# Configure suas credenciais AWS no .env
+# Configure AWS_ACCESS_KEY e AWS_SECRET_KEY no .env
 npm run dev
 ```
 
-### **Frontend**
+### **3. Frontend**
 ```bash
 cd frontend-next
 npm install
 npm run dev
 ```
 
-### **Acessar**
+### **4. Acesse**
 - **Produção**: https://aws-services.sstechnologies-cloud.com
-- **Local Frontend**: http://localhost:3000
-- **Local Backend**: http://localhost:8000
+- **Local**: http://localhost:3000 (frontend) + http://localhost:8000 (backend)
+
+---
 
 ## ⚙️ Configuração
 
 ### **Credenciais AWS**
-1. Acesse o [AWS IAM Console](https://console.aws.amazon.com/iam/)
-2. Crie um usuário com as permissões:
+1. Acesse [AWS IAM Console](https://console.aws.amazon.com/iam/)
+2. Crie usuário com permissões:
    - `AmazonS3FullAccess`
    - `AmazonEC2ReadOnlyAccess`
    - `AmazonDynamoDBReadOnlyAccess`
    - `CloudFrontReadOnlyAccess`
    - `AWSBillingReadOnlyAccess`
-3. Gere Access Key e Secret Key
+3. Gere Access Key + Secret Key
 4. Use no login da aplicação
 
 ### **Variáveis de Ambiente**
 ```env
-# Backend (.env)
+# backend/.env
 AWS_ACCESS_KEY=sua_access_key
 AWS_SECRET_KEY=sua_secret_key
 PORT=8000
-NODE_ENV=development
 
-# Frontend (.env.local)
+# frontend-next/.env.local
 NEXT_PUBLIC_API_URL=http://localhost:8000
 ```
 
-## 🎯 Como Usar
+---
 
-### **1. Login**
-- Insira suas credenciais AWS
-- Sistema verifica automaticamente a conectividade
-- Redirecionamento automático após autenticação
+## 📁 Estrutura do Projeto
 
-### **2. Dashboard**
-- Visão geral de todos os serviços
-- Cards interativos com status
-- Navegação rápida entre módulos
-
-### **3. Módulos**
-- **Dados Reais**: Badge verde "REAL"
-- **Dados Demo**: Badge azul "DEMO"
-- **Fallback Automático**: Sem quebras na interface
-
-### **4. Segurança**
-- Credenciais não armazenadas
-- Operações destrutivas apenas em demos
-- Validação em todas as requisições
-
-## 🔧 Desenvolvimento
-
-### **Estrutura do Projeto**
 ```
 AWS-Services/
 ├── backend/
-│   ├── handlers/          # Lógica de negócio
-│   ├── server.js          # Servidor Express
-│   └── package.json
+│   ├── handlers/              # Lógica de negócio por serviço
+│   ├── server.js              # Express server
+│   ├── routes.js              # Rotas API
+│   └── serverless.yml         # Deploy config
 ├── frontend-next/
-│   ├── pages/             # Páginas Next.js
-│   ├── context/           # Context API
-│   ├── services/          # API calls
-│   └── styles/            # CSS/Tailwind
-└── README.md
+│   ├── pages/                 # Next.js pages
+│   ├── context/               # Context API
+│   ├── services/              # API calls
+│   └── styles/                # Tailwind CSS
+├── infrastructure/            # Scripts de deploy AWS
+└── docs/                      # Documentação
 ```
 
-### **Adicionar Novo Módulo**
-1. Criar handler em `backend/handlers/`
-2. Adicionar rotas em `server.js`
-3. Criar página em `frontend-next/pages/`
-4. Atualizar `services.js` com novo card
-5. Seguir padrão REAL/DEMO
+---
 
-### **Scripts Disponíveis**
-```bash
-# Backend
-npm run dev          # Desenvolvimento
-npm start           # Produção
+## 🎯 Como Usar
 
-# Frontend
-npm run dev         # Desenvolvimento
-npm run build       # Build produção
-npm start          # Servir build
-```
+### **Login**
+1. Insira Access Key e Secret Key
+2. Sistema valida conectividade AWS
+3. Redirecionamento automático para dashboard
+
+### **Dashboard**
+- Cards interativos para cada serviço
+- Badges **REAL** (verde) ou **DEMO** (azul)
+- Navegação rápida entre módulos
+
+### **Módulos**
+- **S3**: Upload/download de arquivos, navegação em pastas
+- **Lambda**: Compactação de imagens com diferentes engines
+- **EC2**: Gerenciamento de instâncias (start/stop/reboot)
+- **DynamoDB**: Visualização de tabelas e dados
+- **RDS**: Gerenciamento de bancos de dados
+- **CloudFront**: Distribuições e invalidação de cache
+- **Cost Explorer**: Faturamento em tempo real
+
+---
 
 ## 🚀 Deploy
 
 ### **Automático (GitHub Actions)**
 ```bash
-git add .
-git commit -m "feat: nova funcionalidade"
 git push origin main
-# Deploy automático para produção
+# Deploy automático via CI/CD
 ```
 
 ### **Manual**
 ```bash
-# Backend
+# Backend (Serverless)
 cd backend
 sls deploy --stage prod
 
-# Frontend
+# Frontend (S3 + CloudFront)
 cd frontend-next
 npm run build
 aws s3 sync out/ s3://aws-services-dashboard-prod --delete
+aws cloudfront create-invalidation --distribution-id YOUR_ID --paths "/*"
 ```
+
+---
 
 ## 🔒 Segurança
 
-### **Boas Práticas Implementadas**
-- ✅ Credenciais não persistidas
-- ✅ Validação de entrada
+### **Boas Práticas**
+- ✅ Credenciais não armazenadas localmente
+- ✅ Validação de entrada em todas as rotas
 - ✅ CORS configurado
-- ✅ Rate limiting (recomendado)
-- ✅ HTTPS em produção (recomendado)
+- ✅ HTTPS em produção
+- ✅ Operações destrutivas apenas em demos
 
-### **Permissões AWS Mínimas**
+### **Permissões IAM Mínimas**
 ```json
 {
   "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Action": [
-        "s3:ListAllMyBuckets",
-        "s3:ListBucket",
-        "s3:GetObject",
-        "s3:PutObject",
-        "ec2:DescribeInstances",
-        "dynamodb:ListTables",
-        "dynamodb:DescribeTable",
-        "cloudfront:ListDistributions",
-        "ce:GetCostAndUsage"
-      ],
-      "Resource": "*"
-    }
-  ]
+  "Statement": [{
+    "Effect": "Allow",
+    "Action": [
+      "s3:ListAllMyBuckets",
+      "s3:ListBucket",
+      "s3:GetObject",
+      "s3:PutObject",
+      "ec2:DescribeInstances",
+      "dynamodb:ListTables",
+      "cloudfront:ListDistributions",
+      "ce:GetCostAndUsage"
+    ],
+    "Resource": "*"
+  }]
 }
 ```
 
+---
+
 ## 🐛 Troubleshooting
 
-### **Problemas Comuns**
-
-**Backend não conecta:**
+### **Backend não conecta**
 ```bash
-# Verificar porta
 netstat -an | findstr :8000
-# Reiniciar servidor
 npm run dev
 ```
 
-**Credenciais inválidas:**
+### **Credenciais inválidas**
 - Verificar Access Key e Secret Key
 - Confirmar permissões IAM
-- Testar com AWS CLI
+- Testar com AWS CLI: `aws sts get-caller-identity`
 
-**Dados não aparecem:**
-- Verificar conectividade backend
+### **Dados não aparecem**
+- Verificar conectividade backend (http://localhost:8000/health)
 - Confirmar credenciais no login
-- Checar logs do console
+- Checar logs do console (F12)
 
-## 📈 Roadmap
+---
 
-### **Próximas Funcionalidades**
-- [ ] **SQS/SNS**: Mensageria
-- [ ] **CloudWatch**: Monitoramento avançado
-- [ ] **IAM**: Usuários e permissões
-- [ ] **ECS/EKS**: Containers
+## 🗺️ Roadmap
 
-### **Melhorias Técnicas**
 - [ ] Migração para AWS SDK v3
+- [ ] SQS/SNS (mensageria)
+- [ ] CloudWatch (monitoramento avançado)
+- [ ] IAM (usuários e permissões)
+- [ ] ECS/EKS (containers)
 - [ ] Testes automatizados
 - [ ] WAF + Security
-- [ ] Monitoramento APM
+
+---
 
 ## 🤝 Contribuição
 
@@ -306,23 +256,27 @@ npm run dev
 4. Push para a branch (`git push origin feature/nova-funcionalidade`)
 5. Abra um Pull Request
 
+---
+
 ## 📄 Licença
 
-Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para detalhes.
+MIT License - veja [LICENSE](LICENSE) para detalhes.
 
-## 👨‍💻 Autor
+---
+
+## 👨💻 Autor
 
 **Sergio Sena**
 - GitHub: [@Sergio-Sena](https://github.com/Sergio-Sena)
 - LinkedIn: [Sergio Sena](https://linkedin.com/in/sergio-sena)
-
-## 🙏 Agradecimentos
-
-- AWS pela documentação completa
-- Comunidade Next.js
-- Tailwind CSS team
-- Todos os contribuidores
+- Portfolio: [dev-cloud.sstechnologies-cloud.com](https://dev-cloud.sstechnologies-cloud.com)
 
 ---
 
-⭐ **Se este projeto foi útil, deixe uma estrela!**
+<div align="center">
+
+**⭐ Se este projeto foi útil, deixe uma estrela!**
+
+[🚀 Ver Demo](https://aws-services.sstechnologies-cloud.com) • [📖 Docs](docs/) • [🐛 Issues](../../issues)
+
+</div>
