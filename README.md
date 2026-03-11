@@ -3,8 +3,15 @@
 [![Status](https://img.shields.io/badge/Status-✅%20Online-brightgreen)](https://aws-services.sstechnologies-cloud.com)
 [![Next.js](https://img.shields.io/badge/Next.js-14-black)](https://nextjs.org/)
 [![Node.js](https://img.shields.io/badge/Node.js-18-green)](https://nodejs.org/)
+[![Python](https://img.shields.io/badge/Python-3.11-blue)](https://python.org/)
 [![AWS](https://img.shields.io/badge/AWS-Serverless-orange)](https://aws.amazon.com/)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+
+[![CI/CD Pipeline](https://github.com/Sergio-Sena/AWS-Services/actions/workflows/main.yml/badge.svg)](https://github.com/Sergio-Sena/AWS-Services/actions/workflows/main.yml)
+[![Backend Python](https://github.com/Sergio-Sena/AWS-Services/actions/workflows/backend-python.yml/badge.svg)](https://github.com/Sergio-Sena/AWS-Services/actions/workflows/backend-python.yml)
+[![Backend Node](https://github.com/Sergio-Sena/AWS-Services/actions/workflows/backend-node.yml/badge.svg)](https://github.com/Sergio-Sena/AWS-Services/actions/workflows/backend-node.yml)
+[![Frontend](https://github.com/Sergio-Sena/AWS-Services/actions/workflows/frontend.yml/badge.svg)](https://github.com/Sergio-Sena/AWS-Services/actions/workflows/frontend.yml)
+[![Terraform](https://github.com/Sergio-Sena/AWS-Services/actions/workflows/terraform.yml/badge.svg)](https://github.com/Sergio-Sena/AWS-Services/actions/workflows/terraform.yml)
 
 > Gerencie seus serviços AWS com interface moderna e dados reais da sua conta.
 
@@ -43,9 +50,13 @@
 
 ### **Backend**
 - **Node.js 18** - Runtime
-- **Express.js** - Framework web
-- **AWS SDK v2** - Integração AWS
-- **Serverless Framework** - Deploy
+- **Python 3.11** - FastAPI backend alternativo
+- **Express.js** - Framework web (Node.js)
+- **FastAPI** - Framework web (Python)
+- **AWS SDK v2** - Integração AWS (Node.js)
+- **Boto3** - AWS SDK (Python)
+- **Serverless Framework** - Deploy Lambda
+- **Docker** - Containerização
 - **Multer** - Upload de arquivos
 
 ### **AWS Services**
@@ -122,18 +133,26 @@ NEXT_PUBLIC_API_URL=http://localhost:8000
 
 ```
 AWS-Services/
-├── backend/
+├── backend/                   # Backend Node.js (Express + Lambda)
 │   ├── handlers/              # Lógica de negócio por serviço
 │   ├── server.js              # Express server
 │   ├── routes.js              # Rotas API
 │   └── serverless.yml         # Deploy config
+├── backend-python/           # Backend Python (FastAPI + Docker)
+│   ├── app/                   # Código FastAPI
+│   ├── tests/                 # Testes Pytest
+│   ├── Dockerfile             # Container Python
+│   └── docker-compose.yml     # Orquestração local
 ├── frontend-next/
 │   ├── pages/                 # Next.js pages
 │   ├── context/               # Context API
 │   ├── services/              # API calls
 │   └── styles/                # Tailwind CSS
-├── infrastructure/            # Scripts de deploy AWS
-└── docs/                      # Documentação
+├── terraform/                # Infraestrutura como Código
+│   ├── modules/               # Módulos reutilizáveis
+│   └── environments/          # Ambientes (dev/prod)
+├── .github/workflows/        # CI/CD GitHub Actions
+└── docs/                     # Documentação
 ```
 
 ---
@@ -238,12 +257,16 @@ npm run dev
 
 ## 🗺️ Roadmap
 
+- [x] Terraform IaC (Fase 1) ✅
+- [x] Backend Python + Docker (Fase 2) ✅
+- [x] CI/CD GitHub Actions (Fase 3) ✅
+- [ ] Kubernetes manifests (Fase 4)
 - [ ] Migração para AWS SDK v3
 - [ ] SQS/SNS (mensageria)
 - [ ] CloudWatch (monitoramento avançado)
 - [ ] IAM (usuários e permissões)
 - [ ] ECS/EKS (containers)
-- [ ] Testes automatizados
+- [ ] Testes E2E
 - [ ] WAF + Security
 
 ---
