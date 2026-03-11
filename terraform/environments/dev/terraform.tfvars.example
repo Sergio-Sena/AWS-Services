@@ -1,0 +1,31 @@
+# AWS Configuration
+aws_region   = "us-east-1"
+project_name = "aws-services"
+environment  = "dev"
+
+# VPC Configuration
+vpc_cidr             = "10.0.0.0/16"
+public_subnet_cidrs  = ["10.0.1.0/24", "10.0.2.0/24", "10.0.3.0/24"]
+private_subnet_cidrs = ["10.0.11.0/24", "10.0.12.0/24", "10.0.13.0/24"]
+availability_zones   = ["us-east-1a", "us-east-1b", "us-east-1c"]
+enable_nat_gateway   = true
+
+# EKS Configuration
+eks_cluster_version      = "1.28"
+eks_node_instance_type   = "t3.medium"
+eks_node_desired_size    = 2
+eks_node_min_size        = 1
+eks_node_max_size        = 4
+
+# RDS Configuration
+rds_engine_version          = "15.4"
+rds_instance_class          = "db.t3.micro"
+rds_allocated_storage       = 20
+rds_database_name           = "awsservices"
+rds_master_username         = "admin"
+rds_master_password         = "CHANGE_ME_STRONG_PASSWORD"
+rds_multi_az                = false
+rds_backup_retention_period = 7
+
+# Monitoring Configuration
+alarm_email = "your-email@example.com"
