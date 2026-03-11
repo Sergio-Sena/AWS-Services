@@ -1,0 +1,12 @@
+{
+  "extends": [
+    "next/core-web-vitals",
+    "plugin:testing-library/react"
+  ],
+  "plugins": ["testing-library"],
+  "rules": {
+    "react/no-unescaped-entities": "off",
+    "@next/next/no-img-element": "off",
+    "testing-library/prefer-screen-queries": "warn"
+  }
+}
