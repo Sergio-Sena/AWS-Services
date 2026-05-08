@@ -51,7 +51,7 @@ jobs:
           cache-dependency-path: frontend-next/package-lock.json
 
       - name: Install dependencies
-        run: cd frontend-next && npm ci
+        run: cd frontend-next && npm install --legacy-peer-deps
 
       - name: Build Next.js
         run: cd frontend-next && npm run build
