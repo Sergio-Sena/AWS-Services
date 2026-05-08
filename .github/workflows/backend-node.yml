@@ -1,6 +1,7 @@
 name: Backend Node.js CI/CD
 
 on:
+  workflow_call:
   push:
     branches: [develop, main]
     paths:

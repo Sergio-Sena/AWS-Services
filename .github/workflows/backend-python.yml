@@ -1,6 +1,7 @@
 name: Backend Python CI/CD
 
 on:
+  workflow_call:
   push:
     branches: [develop, main]
     paths:

@@ -1,6 +1,7 @@
 name: Terraform CI
 
 on:
+  workflow_call:
   push:
     branches: [develop, main]
     paths:
