@@ -1,305 +1,222 @@
 # ☁️ AWS Services Dashboard
 
-[![Status](https://img.shields.io/badge/Status-✅%20Online-brightgreen)](https://aws-services.sstechnologies-cloud.com)
-[![Next.js](https://img.shields.io/badge/Next.js-14-black)](https://nextjs.org/)
-[![Node.js](https://img.shields.io/badge/Node.js-18-green)](https://nodejs.org/)
-[![Python](https://img.shields.io/badge/Python-3.11-blue)](https://python.org/)
-[![AWS](https://img.shields.io/badge/AWS-Serverless-orange)](https://aws.amazon.com/)
+[![Status](https://img.shields.io/badge/Status-✅%20Production-brightgreen)](https://aws-services.sstechnologies-cloud.com)
+[![Pipeline](https://img.shields.io/github/actions/workflow/status/Sergio-Sena/AWS-Services/deploy-production.yml?label=CI%2FCD)](https://github.com/Sergio-Sena/AWS-Services/actions)
+[![AWS](https://img.shields.io/badge/AWS-7%20Services-FF9900?logo=amazonaws)](https://aws.amazon.com/)
+[![AI](https://img.shields.io/badge/AI-6%20Agents-purple)]()
+[![FinOps](https://img.shields.io/badge/FinOps-Automated-00FFFF)]()
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-[![CI/CD Pipeline](https://github.com/Sergio-Sena/AWS-Services/actions/workflows/main.yml/badge.svg)](https://github.com/Sergio-Sena/AWS-Services/actions/workflows/main.yml)
-[![Backend Python](https://github.com/Sergio-Sena/AWS-Services/actions/workflows/backend-python.yml/badge.svg)](https://github.com/Sergio-Sena/AWS-Services/actions/workflows/backend-python.yml)
-[![Backend Node](https://github.com/Sergio-Sena/AWS-Services/actions/workflows/backend-node.yml/badge.svg)](https://github.com/Sergio-Sena/AWS-Services/actions/workflows/backend-node.yml)
-[![Frontend](https://github.com/Sergio-Sena/AWS-Services/actions/workflows/frontend.yml/badge.svg)](https://github.com/Sergio-Sena/AWS-Services/actions/workflows/frontend.yml)
-[![Terraform](https://github.com/Sergio-Sena/AWS-Services/actions/workflows/terraform.yml/badge.svg)](https://github.com/Sergio-Sena/AWS-Services/actions/workflows/terraform.yml)
+> Dashboard para gerenciar serviços AWS com dados reais, interface neon e automação DevOps completa.
 
-> Gerencie seus serviços AWS com interface moderna e dados reais da sua conta.
+**[🚀 Live Demo](https://aws-services.sstechnologies-cloud.com)** | **[📐 Arquitetura](#-arquitetura)** | **[💰 FinOps](#-finops--ai-insights)**
 
-**[🚀 Ver Demo](https://aws-services.sstechnologies-cloud.com)** | **[📖 Docs](docs/)** | **[🐛 Issues](../../issues)**
+---
+
+## 🎯 Problema → Solução → Resultado
+
+| | Descrição |
+|---|---|
+| **Problema** | Como gerenciar múltiplos serviços AWS sem alternar entre consoles, com visibilidade de custos? |
+| **Solução** | Dashboard unificado com dados reais, CI/CD automatizado e FinOps com AI insights |
+| **Resultado** | 7 serviços AWS em 1 interface, deploy em ~3 min, custos visíveis por projeto |
+
+---
+
+## 📐 Arquitetura
+
+```
+┌──────────┐    ┌──────────────┐    ┌──────────────┐    ┌─────────────┐
+│  Client  │───▶│  CloudFront  │───▶│  S3 Frontend │    │  Backend    │
+│ (Browser)│    │  CDN Global  │    │  Next.js 14  │    │  Node/Python│
+└──────────┘    └──────────────┘    └──────────────┘    └──────┬──────┘
+                                                               │
+                                              ┌────────────────┼────────────────┐
+                                              │                │                │
+                                    ┌─────────▼──┐  ┌─────────▼──┐  ┌─────────▼──┐
+                                    │     S3     │  │    EC2     │  │  DynamoDB  │
+                                    │  Buckets   │  │ Instances  │  │   Tables   │
+                                    └────────────┘  └────────────┘  └────────────┘
+                                    ┌────────────┐  ┌────────────┐  ┌────────────┐
+                                    │    RDS     │  │ CloudFront │  │    Cost    │
+                                    │ Databases  │  │   Distros  │  │  Explorer  │
+                                    └────────────┘  └────────────┘  └────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                    CI/CD Pipeline (GitHub Actions)                           │
+│  ai-audit (6 agents) → build → deploy (S3+CDN) → health-check → finops    │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
 
 ---
 
 ## ✨ Features
 
-| Serviço | Status | Funcionalidades |
-|---------|--------|-----------------|
-| **S3** | ✅ | Listagem de buckets, upload multipart, download ZIP, navegação em pastas |
-| **Lambda** | ✅ | Compactação de imagens (Sharp, ImageMagick, Jimp, Canvas) |
-| **EC2** | ✅ | Listagem de instâncias, ações (iniciar/parar/reiniciar), status em tempo real |
-| **DynamoDB** | ✅ | Listagem de tabelas, scan, put item, visualização de dados |
-| **RDS** | ✅ | Listagem de instâncias, operações (iniciar/parar/backup), Multi-AZ |
-| **CloudFront** | ✅ | Listagem de distribuições, invalidar cache, domínios personalizados |
-| **Cost Explorer** | ✅ | Faturamento real (USD → BRL), breakdown por serviço, última fatura |
+| Serviço | Funcionalidades |
+|---|---|
+| **S3** | Listagem de buckets, upload multipart, download ZIP, navegação em pastas |
+| **Lambda** | Compactação de imagens (Sharp, ImageMagick, Jimp, Canvas) |
+| **EC2** | Listagem, start/stop/reboot, status em tempo real |
+| **DynamoDB** | Listagem de tabelas, scan, put item, visualização |
+| **RDS** | Listagem, start/stop/backup, Multi-AZ |
+| **CloudFront** | Distribuições, invalidar cache, domínios |
+| **Cost Explorer** | Faturamento real (USD → BRL), breakdown por serviço |
 
-### 🎯 Destaques
-- **Dados Reais**: Integração direta com sua conta AWS
-- **Fallback Inteligente**: Dados demo quando serviços não disponíveis
-- **Interface Neon**: Design futurista responsivo
-- **Segurança**: Credenciais não persistidas, operações destrutivas apenas em demos
-- **Autenticação**: Login com credenciais AWS (Access Key + Secret Key)
+### Destaques
+- **Dados Reais** — Integração direta com sua conta AWS
+- **Fallback Inteligente** — Dados demo quando serviços não disponíveis
+- **Interface Neon** — Design futurista dark theme responsivo
+- **Segurança** — Credenciais não persistidas
+
+---
+
+## 🚀 CI/CD Pipeline
+
+```
+┌──────────┐    ┌────────┐    ┌────────┐    ┌──────────┐    ┌────────┐    ┌────────┐
+│ AI Audit │───▶│ Build  │───▶│ Deploy │───▶│  Health  │───▶│ FinOps │───▶│ Notify │
+│ 6 Agents │    │Next.js │    │S3 + CDN│    │  Check   │    │Cost+AI │    │ Status │
+└──────────┘    └────────┘    └────────┘    └──────────┘    └────────┘    └────────┘
+```
+
+| Métrica | Valor |
+|---|---|
+| **Tempo total** | ~3 minutos |
+| **Trigger** | Push to `main` |
+| **AI Agents** | 6 (Security, FinOps, Code, Compliance, Performance, Leader) |
+| **Rollback** | `git revert HEAD && git push` |
+
+---
+
+## 🤖 AI Agents (Bedrock)
+
+| Agente | O que audita |
+|---|---|
+| Security | Secrets expostos, IAM permissivo, encryption |
+| FinOps | Right-sizing, storage classes, idle resources |
+| Code Quality | Error handling, hardcoded values, validation |
+| Compliance | LGPD/GDPR, dados pessoais, retenção |
+| Performance | Cold starts, connection reuse, N+1 queries |
+| Leader | Orquestra todos, decide APPROVED/BLOCKED |
+
+---
+
+## 💰 FinOps & AI Insights
+
+Após cada deploy:
+1. Cost Explorer filtra custos por tag `Project=AWS-Services`
+2. Bedrock Claude 3 Haiku gera 3 insights de otimização
+3. Relatório HTML enviado por email via SES
 
 ---
 
 ## 🛠️ Tech Stack
 
-### **Frontend**
-- **Next.js 14** - Framework React com SSR
-- **Tailwind CSS** - Utility-first CSS
-- **Context API** - State management
-- **Font Awesome** - Ícones
+### Frontend
+| Tecnologia | Uso |
+|---|---|
+| Next.js 14 | Framework (Static Export) |
+| Tailwind CSS | Styling |
+| Context API | State management |
 
-### **Backend**
-- **Node.js 18** - Runtime
-- **Python 3.11** - FastAPI backend alternativo
-- **Express.js** - Framework web (Node.js)
-- **FastAPI** - Framework web (Python)
-- **AWS SDK v2** - Integração AWS (Node.js)
-- **Boto3** - AWS SDK (Python)
-- **Serverless Framework** - Deploy Lambda
-- **Docker** - Containerização
-- **Multer** - Upload de arquivos
+### Backend
+| Tecnologia | Uso |
+|---|---|
+| Node.js 18 + Express | API principal |
+| Python 3.11 + FastAPI | Backend alternativo |
+| Docker | Containerização |
+| Serverless Framework | Deploy Lambda |
 
-### **AWS Services**
-- **S3** - Storage + Static hosting
-- **CloudFront** - CDN global
-- **Lambda** - Serverless backend
-- **API Gateway** - REST API
-- **EC2, RDS, DynamoDB** - Recursos gerenciados
+### Infraestrutura
+| Serviço | Uso |
+|---|---|
+| S3 | Storage + Hosting |
+| CloudFront | CDN (unificado) |
+| Terraform | IaC (módulos: VPC, S3, RDS, EKS, CloudFront, Monitoring) |
+| Kubernetes | Manifests (deployments, services, ingress) |
 
 ---
 
 ## 🚀 Quick Start
 
-### **Pré-requisitos**
-- Node.js 18+
-- Credenciais AWS com permissões IAM
-- Git
-
-### **1. Clone o repositório**
 ```bash
+# Clone
 git clone https://github.com/Sergio-Sena/AWS-Services.git
 cd AWS-Services
+
+# Backend
+cd backend && npm install && cp .env.example .env && npm run dev
+
+# Frontend (outro terminal)
+cd frontend-next && npm install && npm run dev
 ```
 
-### **2. Backend**
-```bash
-cd backend
-npm install
-cp .env.example .env
-# Configure AWS_ACCESS_KEY e AWS_SECRET_KEY no .env
-npm run dev
-```
-
-### **3. Frontend**
-```bash
-cd frontend-next
-npm install
-npm run dev
-```
-
-### **4. Acesse**
-- **Produção**: https://aws-services.sstechnologies-cloud.com
-- **Local**: http://localhost:3000 (frontend) + http://localhost:8000 (backend)
+**Produção:** https://aws-services.sstechnologies-cloud.com
 
 ---
 
-## ⚙️ Configuração
-
-### **Credenciais AWS**
-1. Acesse [AWS IAM Console](https://console.aws.amazon.com/iam/)
-2. Crie usuário com permissões:
-   - `AmazonS3FullAccess`
-   - `AmazonEC2ReadOnlyAccess`
-   - `AmazonDynamoDBReadOnlyAccess`
-   - `CloudFrontReadOnlyAccess`
-   - `AWSBillingReadOnlyAccess`
-3. Gere Access Key + Secret Key
-4. Use no login da aplicação
-
-### **Variáveis de Ambiente**
-```env
-# backend/.env
-AWS_ACCESS_KEY=sua_access_key
-AWS_SECRET_KEY=sua_secret_key
-PORT=8000
-
-# frontend-next/.env.local
-NEXT_PUBLIC_API_URL=http://localhost:8000
-```
-
----
-
-## 📁 Estrutura do Projeto
+## 📁 Estrutura
 
 ```
 AWS-Services/
-├── backend/                   # Backend Node.js (Express + Lambda)
-│   ├── handlers/              # Lógica de negócio por serviço
-│   ├── server.js              # Express server
-│   ├── routes.js              # Rotas API
-│   └── serverless.yml         # Deploy config
-├── backend-python/           # Backend Python (FastAPI + Docker)
-│   ├── app/                   # Código FastAPI
-│   ├── tests/                 # Testes Pytest
-│   ├── Dockerfile             # Container Python
-│   └── docker-compose.yml     # Orquestração local
-├── frontend-next/
-│   ├── pages/                 # Next.js pages
-│   ├── context/               # Context API
-│   ├── services/              # API calls
-│   └── styles/                # Tailwind CSS
-├── terraform/                # Infraestrutura como Código
-│   ├── modules/               # Módulos reutilizáveis
-│   └── environments/          # Ambientes (dev/prod)
-├── .github/workflows/        # CI/CD GitHub Actions
-└── docs/                     # Documentação
+├── .github/workflows/        # CI/CD Pipeline
+│   └── deploy-production.yml # ai-audit → build → deploy → finops
+├── frontend-next/            # Next.js 14 (Static Export)
+├── backend/                  # Node.js + Express
+├── backend-python/           # FastAPI + Docker
+├── terraform/                # IaC (VPC, S3, RDS, EKS, CloudFront)
+├── k8s/                      # Kubernetes manifests
+├── scripts/
+│   ├── agents/ai-audit.py   # 6 AI Agents (Bedrock)
+│   └── finops/cost-report.py # Cost + AI + Email
+└── .amazonq/                 # Rules + MCP config
 ```
 
 ---
 
-## 🎯 Como Usar
+## 🔐 Segurança
 
-### **Login**
-1. Insira Access Key e Secret Key
-2. Sistema valida conectividade AWS
-3. Redirecionamento automático para dashboard
-
-### **Dashboard**
-- Cards interativos para cada serviço
-- Badges **REAL** (verde) ou **DEMO** (azul)
-- Navegação rápida entre módulos
-
-### **Módulos**
-- **S3**: Upload/download de arquivos, navegação em pastas
-- **Lambda**: Compactação de imagens com diferentes engines
-- **EC2**: Gerenciamento de instâncias (start/stop/reboot)
-- **DynamoDB**: Visualização de tabelas e dados
-- **RDS**: Gerenciamento de bancos de dados
-- **CloudFront**: Distribuições e invalidação de cache
-- **Cost Explorer**: Faturamento em tempo real
-
----
-
-## 🚀 Deploy
-
-### **Automático (GitHub Actions)**
-```bash
-git push origin main
-# Deploy automático via CI/CD
-```
-
-### **Manual**
-```bash
-# Backend (Serverless)
-cd backend
-sls deploy --stage prod
-
-# Frontend (S3 + CloudFront)
-cd frontend-next
-npm run build
-aws s3 sync out/ s3://aws-services-dashboard-prod --delete
-aws cloudfront create-invalidation --distribution-id YOUR_ID --paths "/*"
-```
-
----
-
-## 🔒 Segurança
-
-### **Boas Práticas**
-- ✅ Credenciais não armazenadas localmente
-- ✅ Validação de entrada em todas as rotas
-- ✅ CORS configurado
-- ✅ HTTPS em produção
-- ✅ Operações destrutivas apenas em demos
-
-### **Permissões IAM Mínimas**
-```json
-{
-  "Version": "2012-10-17",
-  "Statement": [{
-    "Effect": "Allow",
-    "Action": [
-      "s3:ListAllMyBuckets",
-      "s3:ListBucket",
-      "s3:GetObject",
-      "s3:PutObject",
-      "ec2:DescribeInstances",
-      "dynamodb:ListTables",
-      "cloudfront:ListDistributions",
-      "ce:GetCostAndUsage"
-    ],
-    "Resource": "*"
-  }]
-}
-```
-
----
-
-## 🐛 Troubleshooting
-
-### **Backend não conecta**
-```bash
-netstat -an | findstr :8000
-npm run dev
-```
-
-### **Credenciais inválidas**
-- Verificar Access Key e Secret Key
-- Confirmar permissões IAM
-- Testar com AWS CLI: `aws sts get-caller-identity`
-
-### **Dados não aparecem**
-- Verificar conectividade backend (http://localhost:8000/health)
-- Confirmar credenciais no login
-- Checar logs do console (F12)
+| Controle | Implementação |
+|---|---|
+| Credenciais | Não persistidas, fornecidas no login |
+| HTTPS | CloudFront TLS 1.2+ |
+| CORS | Configurado em todas as rotas |
+| IAM | Permissões mínimas documentadas |
+| Operações destrutivas | Apenas em modo demo |
 
 ---
 
 ## 🗺️ Roadmap
 
-- [x] Terraform IaC (Fase 1) ✅
-- [x] Backend Python + Docker (Fase 2) ✅
-- [x] CI/CD GitHub Actions (Fase 3) ✅
-- [ ] Kubernetes manifests (Fase 4)
-- [ ] Migração para AWS SDK v3
+### ✅ Concluído
+- ✅ Dashboard com 7 serviços AWS (dados reais)
+- ✅ Backend Node.js + Python (FastAPI + Docker)
+- ✅ Terraform IaC (6 módulos)
+- ✅ Kubernetes manifests
+- ✅ CI/CD com AI Audit + FinOps
+- ✅ Testes unitários (Jest + Pytest)
+
+### 🔜 Próximo
+- [ ] Migração AWS SDK v3
 - [ ] SQS/SNS (mensageria)
 - [ ] CloudWatch (monitoramento avançado)
-- [ ] IAM (usuários e permissões)
-- [ ] ECS/EKS (containers)
-- [ ] Testes E2E
-- [ ] WAF + Security
-
----
-
-## 🤝 Contribuição
-
-1. Fork o projeto
-2. Crie uma branch (`git checkout -b feature/nova-funcionalidade`)
-3. Commit suas mudanças (`git commit -m 'feat: nova funcionalidade'`)
-4. Push para a branch (`git push origin feature/nova-funcionalidade`)
-5. Abra um Pull Request
-
----
-
-## 📄 Licença
-
-MIT License - veja [LICENSE](LICENSE) para detalhes.
+- [ ] ECS/EKS deploy real
+- [ ] WAF + Security Hub
 
 ---
 
 ## 👨💻 Autor
 
-**Sergio Sena**
-- GitHub: [@Sergio-Sena](https://github.com/Sergio-Sena)
-- LinkedIn: [Sergio Sena](https://linkedin.com/in/sergio-sena)
-- Portfolio: [dev-cloud.sstechnologies-cloud.com](https://dev-cloud.sstechnologies-cloud.com)
+**Sergio Sena** — Cloud & DevOps Engineer
+
+[![GitHub](https://img.shields.io/badge/GitHub-Sergio--Sena-181717?logo=github)](https://github.com/Sergio-Sena)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-Sergio%20Sena-0A66C2?logo=linkedin)](https://linkedin.com/in/sergio-sena)
+[![Portfolio](https://img.shields.io/badge/Portfolio-dev--cloud-00FFFF)](https://dev-cloud.sstechnologies-cloud.com)
 
 ---
 
 <div align="center">
 
 **⭐ Se este projeto foi útil, deixe uma estrela!**
-
-[🚀 Ver Demo](https://aws-services.sstechnologies-cloud.com) • [📖 Docs](docs/) • [🐛 Issues](../../issues)
 
 </div>
