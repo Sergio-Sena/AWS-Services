@@ -341,3 +341,5 @@ kubectl delete -f namespace.yaml
 ---
 
 **Desenvolvido com ❤️ para demonstrar orquestração Kubernetes**
+
+*Last updated: 2026-03-11*
