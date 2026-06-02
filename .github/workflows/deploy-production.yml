@@ -61,7 +61,7 @@ jobs:
         with:
           name: build-artifacts
           path: frontend-next/out/
-          retention-days: 7
+          retention-days: 2
 
   deploy:
     name: Deploy to S3 + CloudFront
